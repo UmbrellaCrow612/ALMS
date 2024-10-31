@@ -1,0 +1,32 @@
+name: Vue Frontend Build
+
+on:
+  pull_request:
+    paths:
+      - 'alms/**'
+      - '.github/workflows/vue-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Install dependencies
+      working-directory: ./alms
+      run: npm ci
+    
+    - name: Build
+      working-directory: ./alms
+      run: npm run build
+    
+    # Optionally add tests if you have any
+    # - name: Run tests
+    #   working-directory: ./alms
+    #   run: npm run test
