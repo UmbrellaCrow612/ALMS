@@ -3,7 +3,7 @@ name: Vue Frontend Build
 on:
   pull_request:
     paths:
-      - 'alms/**'
+      - 'AMLS/**'
       - '.github/workflows/vue-build.yml'
 
 jobs:
@@ -19,14 +19,14 @@ jobs:
         node-version: '20'
     
     - name: Install dependencies
-      working-directory: ./alms
+      working-directory: ./AMLS
       run: npm ci
     
     - name: Build
-      working-directory: ./alms
+      working-directory: ./AMLS
       run: npm run build
     
     # Optionally add tests if you have any
     # - name: Run tests
-    #   working-directory: ./alms
+    #   working-directory: ./AMLS
     #   run: npm run test
