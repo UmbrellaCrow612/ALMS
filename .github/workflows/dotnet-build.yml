@@ -3,7 +3,7 @@ name: .NET API Build
 on:
   pull_request:
     paths:
-      - 'alms.api/**'
+      - 'ALMS.API/**'
       - '.github/workflows/dotnet-build.yml'
 
 jobs:
@@ -19,13 +19,13 @@ jobs:
         dotnet-version: 8.0.x
     
     - name: Restore dependencies
-      working-directory: ./alms.api
+      working-directory: ./ALMS.API
       run: dotnet restore
     
     - name: Build
-      working-directory: ./alms.api
+      working-directory: ./ALMS.API
       run: dotnet build --no-restore
     
     - name: Test
-      working-directory: ./alms.api
+      working-directory: ./ALMS.API
       run: dotnet test --no-build --verbosity normal
