@@ -10,24 +10,86 @@
               <span class="ml-2 text-2xl font-bold text-gray-900">AML</span>
             </div>
           </div>
+          
+          <!-- Desktop Navigation -->
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-            <router-link 
-              v-for="link in navigationLinks" 
-              :key="link.name"
-              :to="link.href"
-              class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-            >
-              {{ link.name }}
-            </router-link>
+            <!-- Show different links based on authentication -->
+            <template v-if="isAuthenticated">
+              <router-link
+                v-for="link in authenticatedLinks"
+                :key="link.name"
+                :to="link.href"
+                class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                {{ link.name }}
+              </router-link>
+            </template>
+            <template v-else>
+              <router-link 
+                v-for="link in navigationLinks" 
+                :key="link.name"
+                :to="link.href"
+                class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+              >
+                {{ link.name }}
+              </router-link>
+            </template>
           </div>
+
+          <!-- User Actions -->
           <div class="hidden sm:ml-6 sm:flex sm:items-center">
-            <button 
-              @click="$router.push('/registration')"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              Sign up
-            </button>
+            <template v-if="isAuthenticated">
+              <div class="ml-3 relative">
+                <button
+                  @click="isProfileOpen = !isProfileOpen"
+                  class="bg-white flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  <User class="h-8 w-8 text-gray-400" />
+                </button>
+
+                <!-- Profile dropdown -->
+                <div
+                  v-if="isProfileOpen"
+                  class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                >
+                  <router-link
+                    to="/profile"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Your Profile
+                  </router-link>
+                  <router-link
+                    to="/subscriptions"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Manage Subscriptions
+                  </router-link>
+                  <button
+                    @click="handleLogout"
+                    class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <button 
+                @click="$router.push('/login')"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 mr-2"
+              >
+                Login
+              </button>
+              <button 
+                @click="$router.push('/registration')"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+              >
+                Sign up
+              </button>
+            </template>
           </div>
+
+          <!-- Mobile menu button -->
           <div class="-mr-2 flex items-center sm:hidden">
             <button 
               @click="isMenuOpen = !isMenuOpen"
@@ -43,20 +105,44 @@
       <!-- Mobile menu -->
       <div v-if="isMenuOpen" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-          <router-link
-            v-for="link in navigationLinks"
-            :key="link.name"
-            :to="link.href"
-            class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
-          >
-            {{ link.name }}
-          </router-link>
-          <router-link
-            to="/signup"
-            class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-indigo-600 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-800"
-          >
-            Sign up
-          </router-link>
+          <template v-if="isAuthenticated">
+            <router-link
+              v-for="link in authenticatedLinks"
+              :key="link.name"
+              :to="link.href"
+              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
+            >
+              {{ link.name }}
+            </router-link>
+            <button
+              @click="handleLogout"
+              class="block w-full text-left pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-red-600 hover:bg-gray-50 hover:border-red-300 hover:text-red-800"
+            >
+              Sign out
+            </button>
+          </template>
+          <template v-else>
+            <router-link
+              v-for="link in navigationLinks"
+              :key="link.name"
+              :to="link.href"
+              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
+            >
+              {{ link.name }}
+            </router-link>
+            <router-link
+              to="/login"
+              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-indigo-600 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-800"
+            >
+              Login
+            </router-link>
+            <router-link
+              to="/registration"
+              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-indigo-600 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-800"
+            >
+              Sign up
+            </router-link>
+          </template>
         </div>
       </div>
     </header>
@@ -160,7 +246,7 @@
       </div>
 
       <!-- CTA Section -->
-      <div class="mt-32 bg-gradient-to-r from-indigo-700 to-purple-700">
+      <div v-if="!isAuthenticated" class="mt-32 bg-gradient-to-r from-indigo-700 to-purple-700">
         <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
           <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
             <span class="block">Boost your knowledge.</span>
@@ -204,18 +290,35 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, Users, Clock, Search, Menu, X } from 'lucide-vue-next'
+import { BookOpen, User, Menu, X, Search, Clock } from 'lucide-vue-next'
 
 const router = useRouter()
 const isMenuOpen = ref(false)
+const isProfileOpen = ref(false)
 const searchQuery = ref('')
+const isAuthenticated = ref(false)
+const user = ref(null)
 
+// Navigation links for non-authenticated users
 const navigationLinks = [
-  { name: 'About', href: '#' },
-  { name: 'Services', href: '#' },
-  { name: 'Contact', href: '#' }
+  { name: 'About', href: '/about' },
+  { name: 'Services', href: '/services' },
+  { name: 'Contact', href: '/contact' }
+]
+
+// Additional links for authenticated users
+const authenticatedLinks = [
+  // Standard navigation links
+  { name: 'About', href: '/about' },
+  { name: 'Services', href: '/services' },
+  { name: 'Contact', href: '/contact' },
+  // Authenticated-only links
+  { name: 'Search', href: '/search' },
+  { name: 'Borrow', href: '/borrow' },
+  { name: 'Inventory', href: '/inventory' },
+  { name: 'Subscriptions', href: '/subscriptions' }
 ]
 
 const services = [
@@ -228,7 +331,7 @@ const services = [
   {
     title: 'Multiple Branches',
     description: 'Visit our branches across all cities and towns in England for in-person services and local community engagement.',
-    icon: Users,
+    icon: User,
     gradientClass: 'bg-gradient-to-br from-purple-500 to-pink-600'
   },
   {
@@ -243,7 +346,7 @@ const socialLinks = [
   {
     name: 'Facebook',
     href: '#',
-    icon: 'FacebookIcon' // You'll need to import or create these icons
+    icon: 'FacebookIcon'
   },
   {
     name: 'Twitter',
@@ -252,8 +355,41 @@ const socialLinks = [
   }
 ]
 
-const handleSearch = () => {
-  console.log('Searching for:', searchQuery.value)
-  // Implement search functionality here
+// Handle authentication
+const handleLogout = () => {
+  isAuthenticated.value = false
+  user.value = null
+  localStorage.removeItem('user')
+  router.push('/login')
 }
+
+const checkAuth = () => {
+  const savedUser = localStorage.getItem('user')
+  if (savedUser) {
+    user.value = JSON.parse(savedUser)
+    isAuthenticated.value = true
+  }
+}
+
+// Handle search
+const handleSearch = () => {
+  if (searchQuery.value.trim()) {
+    router.push({
+      path: '/search',
+      query: { q: searchQuery.value }
+    })
+  }
+}
+
+// Close dropdown when clicking outside
+onMounted(() => {
+  checkAuth() // Check authentication status on mount
+  
+  document.addEventListener('click', (event) => {
+    const dropdown = document.querySelector('.relative')
+    if (dropdown && !dropdown.contains(event.target)) {
+      isProfileOpen.value = false
+    }
+  })
+})
 </script>
