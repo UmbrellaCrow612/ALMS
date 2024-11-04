@@ -15,6 +15,12 @@
 
         public required bool IsReturned { get; set; }
 
+
+        //Relationships 
+
+        public Media? Media { get; set; } = null;
+
+        public required string MediaId { get; set; }
     }
 
     

@@ -10,6 +10,11 @@
         public required decimal MonthlyFee { get; set; }
 
 
+        //Relationships
+
+        public User? User { get; set; } = null;
+        public required string UserId { get; set; }
+
     }
 
     public enum MembershipLevel
