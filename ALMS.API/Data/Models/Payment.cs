@@ -10,6 +10,15 @@
         public required PaymentMethod PaymentMethod { get; set; }
 
         public required PaymentStatus PaymentStatus { get; set; }
+
+        //Relationships
+
+        public User? User { get; set; } = null;
+
+        public required string UserId { get; set; }
+
+        public IEnumerable<Transaction>? transactions { get; set; } = [];
+
     }
 
     public enum PaymentMethod

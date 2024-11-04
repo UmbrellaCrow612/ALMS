@@ -1,4 +1,7 @@
-﻿namespace ALMS.API.Data
+﻿
+using ALMS.API.Data.Models;
+
+namespace ALMS.API.Data
 {
     public class Media
     {
@@ -14,6 +17,9 @@
         public required decimal RentalPrice { get; set; }
 
         public MediaType Type { get; set; }
+
+        //Relationships
+        public IEnumerable<Transaction>? Transactions { get; set; } = [];
     }
 
 

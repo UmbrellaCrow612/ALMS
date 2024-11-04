@@ -12,6 +12,12 @@
         public DateTime? EndDate { get; set;}
 
         public required bool IsActive { get; set; }
+
+        //Relationships
+
+        public User? User { get; set; } = null;
+        public required string UserId { get; set; }
+
     }
 
     public enum SubscriptionType

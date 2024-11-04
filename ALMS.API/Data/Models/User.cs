@@ -14,6 +14,21 @@
         public required string Address { get; set; }
 
         public required string PhoneNumber { get; set;}
+
+
+        //RelationShips:
+
+        public Membership? Membership { get; set; } = null;
+
+        public string? MembershipId {  get; set; } = null;
+
+        public IEnumerable<Payment>? Payments { get; set; } = [];
+
+        public IEnumerable<Subscription>? Subscriptions { get; set; } = [];
+
+        public Account? Account { get; set; } = null!;
+
+        public required string AccountId { get; set; }
     }
 
     public enum UserRole

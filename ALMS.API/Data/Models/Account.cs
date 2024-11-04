@@ -8,6 +8,13 @@
         public required string PasswordHash { get; set; }
 
         public required AccountStatus Status { get; set; }
+
+
+        //Relationships
+
+        public User? User { get; set; } = null;
+        public required string UserId { get; set; }
+
     }
 
     public enum AccountStatus
