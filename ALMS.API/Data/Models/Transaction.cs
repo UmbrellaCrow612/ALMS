@@ -1,6 +1,6 @@
 ﻿namespace ALMS.API.Data.Models
 {
-    public class Transactions
+    public class Transaction
     {
     }
 }
