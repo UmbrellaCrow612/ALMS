@@ -29,6 +29,8 @@
         public Account? Account { get; set; } = null!;
 
         public required string AccountId { get; set; }
+
+        public IEnumerable<Transaction>? Transactions { get; set; } = [];
     }
 
     public enum UserRole

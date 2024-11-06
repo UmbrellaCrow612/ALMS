@@ -17,7 +17,7 @@
 
         public required string UserId { get; set; }
 
-        public IEnumerable<Transaction>? transactions { get; set; } = [];
+        public IEnumerable<Transaction>? Transactions { get; set; } = [];
 
     }
 
