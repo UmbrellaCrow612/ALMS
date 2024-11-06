@@ -3,6 +3,9 @@ using ALMS.API.Data.Models;
 
 namespace ALMS.API.Data
 {
+    /// <summary>
+    /// Represents a media item for example DVD, Book, AudioBook etc
+    /// </summary>
     public class Media
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -12,6 +15,7 @@ namespace ALMS.API.Data
         public required string AuthorName { get; set; }
 
         public required string Genre { get; set; }
+
         public string? ISBN { get; set; }
 
         public required decimal RentalPrice { get; set; }
@@ -24,7 +28,6 @@ namespace ALMS.API.Data
         public IEnumerable<TransactionMedia>? TransactionMediaList { get; set; } = [];
 
     }
-
 
     public enum MediaType
     {

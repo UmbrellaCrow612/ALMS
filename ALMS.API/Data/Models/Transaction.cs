@@ -28,7 +28,7 @@
 
         public required string PaymentId { get; set;}
 
-        public User? User { get; set; } = null;
+        public ApplicationUser? User { get; set; } = null;
 
         public required string UserId { get; set;}
 
