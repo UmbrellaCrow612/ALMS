@@ -25,6 +25,13 @@
 
     public enum MediaType
     {
-
+        DVD = 0,
+        Book = 1,
+        AudioBook = 2,
+        Games = 3,
+        Journal = 4,
+        Periodicals = 5,
+        CDs = 6,
+        MultimediaTitles = 7
     }
 }
