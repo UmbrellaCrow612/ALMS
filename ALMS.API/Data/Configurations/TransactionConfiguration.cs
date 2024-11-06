@@ -14,7 +14,7 @@ namespace ALMS.API.Data.Configurations
 
             builder.HasOne(x => x.User).WithMany(x => x.Transactions).HasForeignKey(x => x.UserId);
 
-            builder.HasMany(x=>x.MediaList).
+            builder.HasMany(x=>x.TransactionMediaList).WithOne(x=>x.Transaction).HasForeignKey(x => x.TransactionId);
         }
     }
 }

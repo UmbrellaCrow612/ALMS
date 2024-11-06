@@ -20,6 +20,9 @@ namespace ALMS.API.Data
 
         //Relationships
         public IEnumerable<Transaction>? Transactions { get; set; } = [];
+
+        public IEnumerable<TransactionMedia>? TransactionMediaList { get; set; } = [];
+
     }
 
 

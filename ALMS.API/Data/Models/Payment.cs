@@ -19,6 +19,7 @@
 
         public IEnumerable<Transaction>? Transactions { get; set; } = [];
 
+
     }
 
     public enum PaymentMethod

@@ -7,7 +7,7 @@
         public Transaction? Transaction { get; set; } = null;
         public required string MediaId { get; set; }
 
-        public Media? Media { get; set; } = [];
+        public Media? Media { get; set; } = null;
 
 
     }
