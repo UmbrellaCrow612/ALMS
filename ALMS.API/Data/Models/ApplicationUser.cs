@@ -14,6 +14,8 @@ namespace ALMS.API.Data.Models
         /// Higher privilege will activate a user account / in the system treat this model as account 
         /// </summary>
         public bool IsActive { get; set; } = false;
+        public required MembershipStatus MembershipStatus { get; set; } = MembershipStatus.NotActive;
+        public required int MaxBorrowLimit { get; set; }
 
 
         /// <summary>
@@ -24,5 +26,11 @@ namespace ALMS.API.Data.Models
         /// Ef Core Nav Property
         /// </summary>
         public ICollection<Payment> Payments { get; set; } = [];
+    }
+
+    public enum MembershipStatus
+    {
+        NotActive = 0,
+        Active = 1,
     }
 }
