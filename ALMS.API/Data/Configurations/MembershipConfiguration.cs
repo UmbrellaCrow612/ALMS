@@ -8,6 +8,11 @@ namespace ALMS.API.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Membership> builder)
         {
+            builder.HasKey(x => x.Id);
+
+            builder.HasIndex(x => x.Id).IsUnique();
+
+            builder.HasOne(x => x.User).WithOne(x => x.Membership).HasForeignKey<User>(x => x.MembershipId);
         }
     }
 }

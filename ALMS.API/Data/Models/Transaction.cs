@@ -20,8 +20,21 @@
 
         public Media? Media { get; set; } = null;
 
+        public IEnumerable<Media> MediaList { get; set; } = [];
+
         public required string MediaId { get; set; }
+
+        public Payment? Payment { get; set; } = null;
+
+        public required string PaymentId { get; set;}
+
+        public User? User { get; set; } = null;
+
+        public required string UserId { get; set;}
+
+        public IEnumerable<TransactionMedia>? TransactionMediaList { get; set; } = [];
+
     }
 
-    
+
 }
