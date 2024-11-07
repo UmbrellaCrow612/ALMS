@@ -6,20 +6,24 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace ALMS.API.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) : ControllerBase
+    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, IConfiguration configuration) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly IUserStore<ApplicationUser> _userStore = userStore;
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
+        private readonly IConfiguration _configuration = configuration;
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("register")]
@@ -44,27 +48,42 @@ namespace ALMS.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult> Login([FromBody] LoginDto loginDto, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
+        public async Task<ActionResult<string>> Login([FromBody] LoginDto loginDto)
         {
-            var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
-            var isPersistent = (useCookies == true) && (useSessionCookies != true);
-            _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
-
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
-
             if (user is null || !user.IsApproved)
             {
-                return Unauthorized("User dose not exist or is approved yet, please ask for approval");
+                return Unauthorized("User does not exist or is not approved yet, please ask for approval");
             }
 
-            var result = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, isPersistent, lockoutOnFailure: false);
+            var userRoles = await _userManager.GetRolesAsync(user);
 
-            if (!result.Succeeded)
+            var isValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+            if (!isValid)
             {
                 return Unauthorized();
             }
 
-            return Ok();
+            var claims = new List<Claim>();
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id);
+                new Claim(ClaimTypes.Email, user.Email!);
+            };
+
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(30),
+                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new ApplicationException("No Key provided"))), SecurityAlgorithms.HmacSha256)
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
