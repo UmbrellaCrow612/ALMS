@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241107112038_Init")]
+    [Migration("20241107193645_Init")]
     partial class Init
     {
         /// <inheritdoc />
