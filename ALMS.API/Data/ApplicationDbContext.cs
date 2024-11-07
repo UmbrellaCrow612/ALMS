@@ -2,6 +2,7 @@
 using ALMS.API.Data.Models;
 using System.Reflection;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace ALMS.API.Data
 {
@@ -17,6 +18,7 @@ namespace ALMS.API.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
         }
     }
 }

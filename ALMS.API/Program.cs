@@ -1,6 +1,6 @@
 using ALMS.API.Data;
 using ALMS.API.Data.Models;
-using Microsoft.AspNetCore.Hosting;
+using ALMS.API.Data.Seeding;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,5 +40,11 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    await UserRolesSeed.SeedAsync(roleManager);
+}
 
 app.Run();
