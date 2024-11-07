@@ -1,4 +1,5 @@
 ﻿using ALMS.API.Data.Models;
+using ALMS.API.DTOs.Auth;
 using ALMS.API.DTOs.Users;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -33,6 +34,30 @@ namespace ALMS.API.Controllers
             if (!result.Succeeded)
             {
                 return BadRequest(result);
+            }
+
+            return Ok();
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult> Login([FromBody] LoginDto loginDto, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
+        {
+            var useCookieScheme = (useCookies == true) || (useSessionCookies == true);
+            var isPersistent = (useCookies == true) && (useSessionCookies != true);
+            _signInManager.AuthenticationScheme = useCookieScheme ? IdentityConstants.ApplicationScheme : IdentityConstants.BearerScheme;
+
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+            if (user is null || !user.IsApproved)
+            {
+                return Unauthorized("User dose not exist or is approved yet, please ask for approval");
+            }
+
+            var result = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, isPersistent, lockoutOnFailure: true);
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized();
             }
 
             return Ok();
