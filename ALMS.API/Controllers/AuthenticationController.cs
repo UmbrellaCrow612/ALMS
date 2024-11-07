@@ -55,7 +55,7 @@ namespace ALMS.API.Controllers
                 return Unauthorized("User dose not exist or is approved yet, please ask for approval");
             }
 
-            var result = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, isPersistent, lockoutOnFailure: true);
+            var result = await _signInManager.PasswordSignInAsync(loginDto.Email, loginDto.Password, isPersistent, lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
