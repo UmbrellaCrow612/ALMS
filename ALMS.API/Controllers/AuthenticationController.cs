@@ -59,17 +59,16 @@ namespace ALMS.API.Controllers
             }
 
             var userRoles = await _userManager.GetRolesAsync(user);
-
             var isValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
             if (!isValid)
             {
                 return Unauthorized();
             }
 
-            var claims = new List<Claim>();
+            var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id);
-                new Claim(ClaimTypes.Email, user.Email!);
+                new(ClaimTypes.NameIdentifier, user.Id),
+                new(ClaimTypes.Email, user.Email!)
             };
 
             foreach (var role in userRoles)
@@ -77,10 +76,45 @@ namespace ALMS.API.Controllers
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var token = _jwtService.GenerateTokens(claims);
+            var (AccessToken, RefreshToken) = _jwtService.GenerateTokens(claims);
 
-            return Ok(new { accessToken = token.AccessToken, refreshToken = token.RefreshToken });
+            return Ok(new { accessToken = AccessToken, refreshToken = RefreshToken });
         }
+
+        [AllowAnonymous]
+        [HttpPost("refresh")]
+        public async Task<ActionResult<object>> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            var principal = _jwtService.GetPrincipalFromExpiredToken(refreshTokenDto.RefreshToken);
+            if (principal == null)
+            {
+                return Unauthorized("Invalid refresh token");
+            }
+
+            var username = principal.Identity.Name;
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                return Unauthorized("User does not exist");
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var claims = new List<Claim>
+            { 
+                new(ClaimTypes.NameIdentifier, user.Id),
+                new(ClaimTypes.Email, user.Email!)
+            };
+
+            foreach (var role in userRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var (AccessToken, RefreshToken) = _jwtService.GenerateTokens(claims);
+
+            return Ok(new { accessToken = AccessToken, refreshToken = RefreshToken });
+        }
+
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/approve")]
