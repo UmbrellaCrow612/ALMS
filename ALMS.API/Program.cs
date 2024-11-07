@@ -1,6 +1,6 @@
-using ALMS.API.Data;
 using ALMS.API.Data.Models;
 using ALMS.API.Data.Seeding;
+using ALMS.API.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +27,6 @@ builder.Services.AddAutoMapper(cfg =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -48,8 +47,6 @@ using (var scope = app.Services.CreateScope())
 
     await UserRolesSeed.SeedAsync(roleManager);
     await UserSeeding.SeedAsync(userManager);
-
-
 }
 
 app.Run();

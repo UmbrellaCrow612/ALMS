@@ -1,7 +1,9 @@
-﻿using ALMS.API.Data.Models;
+﻿using ALMS.API.Core.Constants;
+using ALMS.API.Data.Models;
 using ALMS.API.DTOs.Auth;
 using ALMS.API.DTOs.Users;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +20,7 @@ namespace ALMS.API.Controllers
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
+        [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("register")]
         public async Task<ActionResult<IdentityResult>> Register([FromBody] CreateUserDto createUserDto)
         {
