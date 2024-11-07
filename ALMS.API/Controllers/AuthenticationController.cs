@@ -2,7 +2,6 @@
 using ALMS.API.DTOs.Auth;
 using ALMS.API.DTOs.Users;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,13 +9,14 @@ namespace ALMS.API.Controllers
 {
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserStore<ApplicationUser> userStore) : ControllerBase
+    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
         private readonly IUserStore<ApplicationUser> _userStore = userStore;
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
+        private readonly RoleManager<IdentityRole> _roleManager = roleManager;
 
         [HttpPost("register")]
         public async Task<ActionResult<IdentityResult>> Register([FromBody] CreateUserDto createUserDto)
@@ -84,6 +84,28 @@ namespace ALMS.API.Controllers
             return Ok();
         }
 
+        [HttpPost("users/{id}/roles")]
+        public async Task<ActionResult> AddRoles([FromBody] IEnumerable<string> Roles, string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+            {
+                return NotFound("User not found");
+            }
+
+            foreach (var role in Roles)
+            {
+                if (!await _roleManager.RoleExistsAsync(role))
+                {
+                    return BadRequest($"{role} dose not exist in database.");
+                }
+            }
+
+            await _userManager.AddToRolesAsync(user, Roles);
+
+            return Ok();
+        }
     }
 
 
