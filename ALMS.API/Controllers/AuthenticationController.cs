@@ -18,7 +18,6 @@ namespace ALMS.API.Controllers
         private readonly IUserStore<ApplicationUser> _userStore = userStore;
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
 
-        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<IdentityResult>> Register([FromBody] CreateUserDto createUserDto)
         {
@@ -59,6 +58,28 @@ namespace ALMS.API.Controllers
             {
                 return Unauthorized();
             }
+
+            return Ok();
+        }
+
+        [HttpPost("users/{id}/approve")]
+        public async Task<ActionResult> ApproveUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user is null)
+            {
+                return NotFound("User dose not exist.");
+            }
+
+            if (user.IsApproved)
+            {
+                return BadRequest("User is already approved");
+            }
+
+            user.IsApproved = true;
+
+            await _userStore.UpdateAsync(user, CancellationToken.None);
 
             return Ok();
         }

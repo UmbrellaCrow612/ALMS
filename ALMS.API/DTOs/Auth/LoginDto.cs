@@ -10,8 +10,5 @@ namespace ALMS.API.DTOs.Auth
 
         [Required]
         public required string Password { get; set; }
-
-        [Required]
-        public required bool RememberMe { get; set; }
     }
 }
