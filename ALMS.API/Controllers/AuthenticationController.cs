@@ -1,4 +1,5 @@
-﻿using ALMS.API.Core.Constants;
+﻿using ALMS.API.Core;
+using ALMS.API.Core.Constants;
 using ALMS.API.Data.Models;
 using ALMS.API.DTOs.Auth;
 using ALMS.API.DTOs.Users;
@@ -16,7 +17,7 @@ namespace ALMS.API.Controllers
     [Authorize]
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, IConfiguration configuration) : ControllerBase
+    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JWTService jWTService) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -24,6 +25,7 @@ namespace ALMS.API.Controllers
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly IConfiguration _configuration = configuration;
+        private readonly JWTService _jwtService = jWTService;
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("register")]
@@ -48,7 +50,7 @@ namespace ALMS.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login([FromBody] LoginDto loginDto)
+        public async Task<ActionResult<object>> Login([FromBody] LoginDto loginDto)
         {
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             if (user is null || !user.IsApproved)
@@ -75,15 +77,9 @@ namespace ALMS.API.Controllers
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(30),
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new ApplicationException("No Key provided"))), SecurityAlgorithms.HmacSha256)
-            );
+            var token = _jwtService.GenerateTokens(claims);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(new { accessToken = token.AccessToken, refreshToken = token.RefreshToken });
         }
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
@@ -133,4 +129,6 @@ namespace ALMS.API.Controllers
             return Ok();
         }
     }
+
+   
 }
