@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241106171715_Init")]
+    [Migration("20241107112038_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -47,7 +47,7 @@ namespace ALMS.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")

@@ -13,7 +13,7 @@ namespace ALMS.API.Data.Models
         /// <summary>
         /// Higher privilege will activate a user account / in the system treat this model as account 
         /// </summary>
-        public bool IsActive { get; set; } = false;
+        public bool IsApproved { get; set; } = false;
         public required MembershipStatus MembershipStatus { get; set; } = MembershipStatus.NotActive;
         public required int MaxBorrowLimit { get; set; }
 

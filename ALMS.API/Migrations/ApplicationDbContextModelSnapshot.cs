@@ -44,7 +44,7 @@ namespace ALMS.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")
