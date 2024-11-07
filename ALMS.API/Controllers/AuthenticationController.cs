@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ALMS.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("auth")]
     public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager) : ControllerBase
@@ -41,6 +42,7 @@ namespace ALMS.API.Controllers
             return Ok();
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDto loginDto, [FromQuery] bool? useCookies, [FromQuery] bool? useSessionCookies)
         {
@@ -65,6 +67,7 @@ namespace ALMS.API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/approve")]
         public async Task<ActionResult> ApproveUser(string id)
         {
@@ -87,6 +90,7 @@ namespace ALMS.API.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/roles")]
         public async Task<ActionResult> AddRoles([FromBody] IEnumerable<string> Roles, string id)
         {
