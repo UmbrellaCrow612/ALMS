@@ -10,7 +10,7 @@ namespace ALMS.API.Core
     {
         private readonly IConfiguration _configuration;
         private readonly string _issuer;
-        private readonly string _audience;
+        private readonly List<string> _audiences;
         private readonly string _key;
         private readonly int _accessTokenExpiryMinutes;
         private readonly int _refreshTokenExpiryMinutes;
@@ -19,10 +19,13 @@ namespace ALMS.API.Core
         {
             _configuration = configuration;
             _issuer = _configuration["Jwt:Issuer"] ?? throw new ApplicationException("JWT Issuer is not configured");
-            _audience = _configuration["Jwt:Audience"] ?? throw new ApplicationException("JWT Audience is not configured");
             _key = _configuration["Jwt:Key"] ?? throw new ApplicationException("JWT key is not configured");
             _accessTokenExpiryMinutes = int.Parse(_configuration["Jwt:AccessTokenExpiryMinutes"] ?? "30");
             _refreshTokenExpiryMinutes = int.Parse(_configuration["Jwt:RefreshTokenExpiryMinutes"] ?? "1440"); // Default 1 day
+
+            // Retrieve audiences from configuration
+            _audiences = _configuration.GetSection("Jwt:Audiences").Get<List<string>>() ??
+                         throw new ApplicationException("JWT Audiences are not configured");
         }
 
         public (string AccessToken, string RefreshToken) GenerateTokens(IEnumerable<Claim> claims)
@@ -39,7 +42,7 @@ namespace ALMS.API.Core
 
             var token = new JwtSecurityToken(
                 issuer: _issuer,
-                audience: _audience,
+                audience: _audiences.First(), // Default to the first audience
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(_accessTokenExpiryMinutes),
                 signingCredentials: creds);
@@ -104,7 +107,7 @@ namespace ALMS.API.Core
                 ValidateIssuer = true,
                 ValidIssuer = _issuer,
                 ValidateAudience = true,
-                ValidAudience = _audience,
+                ValidAudiences = _audiences, // Use the list of audiences here
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key)),
                 ValidateLifetime = validateLifetime,
