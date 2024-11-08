@@ -14,14 +14,13 @@ namespace ALMS.API.Controllers
     [Authorize]
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, IConfiguration configuration, JWTService jWTService) : ControllerBase
+    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, JWTService jWTService) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IUserStore<ApplicationUser> _userStore = userStore;
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-        private readonly IConfiguration _configuration = configuration;
         private readonly JWTService _jwtService = jWTService;
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
