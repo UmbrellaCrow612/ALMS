@@ -10,67 +10,49 @@ namespace ALMS.API.Data.Seeding
     {
         public static async Task SeedAsync(UserManager<ApplicationUser> userManager)
         {
-            var branchLibrarianEmail = "branchlibrarian@example.com";
-            var guestEmail = "guest@example.com";
-
-            // Seed BranchLibrarian user
-            var librarian = await userManager.FindByEmailAsync(branchLibrarianEmail);
-            if (librarian == null)
+            // Role-specific user data
+            var users = new[]
             {
-                var newLibrarian = new ApplicationUser
-                {
-                    UserName = branchLibrarianEmail,
-                    Email = branchLibrarianEmail,
-                    FirstName = "Default",
-                    LastName = "Librarian",
-                    Address = "123 Library St",
-                    IsApproved = true,
-                    MembershipStatus = MembershipStatus.Active,
-                    MaxBorrowLimit = 10
-                };
+                new { Email = "branchlibrarian@example.com", FirstName = "Default", LastName = "Librarian", Role = UserRoles.BranchLibarian, Password = "SecureP@ssw0rd", MaxBorrowLimit = 10, MembershipStatus = MembershipStatus.Active },
+                new { Email = "guest@example.com", FirstName = "Default", LastName = "Guest", Role = UserRoles.Guest, Password = "GuestP@ssw0rd", MaxBorrowLimit = 0, MembershipStatus = MembershipStatus.NotActive },
+                new { Email = "librarymember@example.com", FirstName = "Default", LastName = "Member", Role = UserRoles.LibaryMember, Password = "MemberP@ssw0rd", MaxBorrowLimit = 5, MembershipStatus = MembershipStatus.Active },
+                new { Email = "callcenteroperator@example.com", FirstName = "Default", LastName = "Operator", Role = UserRoles.CallCenterOperator, Password = "OperatorP@ssw0rd", MaxBorrowLimit = 0, MembershipStatus = MembershipStatus.NotActive },
+                new { Email = "accountant@example.com", FirstName = "Default", LastName = "Accountant", Role = UserRoles.Accountant, Password = "AccountP@ssw0rd", MaxBorrowLimit = 0, MembershipStatus = MembershipStatus.NotActive }
+            };
 
-                var result = await userManager.CreateAsync(newLibrarian, "SecureP@ssw0rd");
-
-                if (result.Succeeded)
+            foreach (var user in users)
+            {
+                var existingUser = await userManager.FindByEmailAsync(user.Email);
+                if (existingUser == null)
                 {
-                    await userManager.AddToRoleAsync(newLibrarian, UserRoles.BranchLibarian);
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
+                    var newUser = new ApplicationUser
                     {
-                        Console.WriteLine($"Error creating BranchLibrarian: {error.Description}");
+                        UserName = user.Email,
+                        Email = user.Email,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Address = "123 Default St",
+                        IsApproved = true,
+                        MembershipStatus = user.MembershipStatus,
+                        MaxBorrowLimit = user.MaxBorrowLimit
+                    };
+
+                    var result = await userManager.CreateAsync(newUser, user.Password);
+
+                    if (result.Succeeded)
+                    {
+                        if (await userManager.IsInRoleAsync(newUser, user.Role))
+                        {
+                            await userManager.AddToRoleAsync(newUser, user.Role);
+                        }
+                        else
+                        {
+                        
+                        }
                     }
-                }
-            }
-
-            // Seed Guest user
-            var guest = await userManager.FindByEmailAsync(guestEmail);
-            if (guest == null)
-            {
-                var newGuest = new ApplicationUser
-                {
-                    UserName = guestEmail,
-                    Email = guestEmail,
-                    FirstName = "Default",
-                    LastName = "Guest",
-                    Address = "456 Guest Rd",
-                    IsApproved = true,
-                    MembershipStatus = MembershipStatus.NotActive,
-                    MaxBorrowLimit = 0 // Set a default borrow limit for guests
-                };
-
-                var guestResult = await userManager.CreateAsync(newGuest, "GuestP@ssw0rd");
-
-                if (guestResult.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(newGuest, UserRoles.Guest);
-                }
-                else
-                {
-                    foreach (var error in guestResult.Errors)
+                    else
                     {
-                        Console.WriteLine($"Error creating Guest: {error.Description}");
+                       
                     }
                 }
             }
