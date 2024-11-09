@@ -5,7 +5,7 @@ namespace ALMS.API.DTOs.Users
     public class CreateUserDto
     {
         [Required]
-        public required string Username { get; set; }
+        public required string UserName { get; set; }
 
         [Required]
         [EmailAddress]

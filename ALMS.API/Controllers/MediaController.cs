@@ -1,4 +1,6 @@
-﻿using ALMS.API.Data;
+﻿using ALMS.API.Core.Constants;
+using ALMS.API.Data;
+using ALMS.API.Data.Models;
 using ALMS.API.DTOs.Media;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -54,7 +56,7 @@ namespace ALMS.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<MediaDto>> GetMediaById(string id)
+        public async Task<ActionResult<object>> GetMediaById(string id)
         {
             var media = await _dbContext.Medias.FirstOrDefaultAsync(m => m.Id == id);
             if (media is null) return NotFound();
@@ -62,6 +64,45 @@ namespace ALMS.API.Controllers
             var mediaDto = _mapper.Map<MediaDto>(media);
 
             return Ok(mediaDto);
+        }
+
+        [Authorize(Roles = UserRoles.BranchLibarian)]
+        [HttpPost]
+        public async Task<ActionResult> CreateMediaItem([FromBody] CreateMediaDto createMediaDto)
+        {
+            var mediaItemToCreate = _mapper.Map<Media>(createMediaDto);
+
+            await _dbContext.Medias.AddAsync(mediaItemToCreate);
+            await _dbContext.SaveChangesAsync();
+
+            return Created(nameof(CreateMediaItem), new { mediaItemToCreate.Id });
+        }
+
+        [Authorize(Roles = UserRoles.BranchLibarian)]
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> UpdateMediaItems([FromBody] UpdateMediaDto updateMediaDto, string id)
+        {
+            var mediaItemToUpdate = await _dbContext.Medias.FirstOrDefaultAsync(x => x.Id == id);
+            if(mediaItemToUpdate is null) return NotFound();
+
+            _mapper.Map(updateMediaDto, mediaItemToUpdate);
+
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = UserRoles.BranchLibarian)]
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteMediaItem(string id)
+        {
+            var mediaItemToDelete = await _dbContext.Medias.FirstOrDefaultAsync(x => x.Id == id);
+            if(mediaItemToDelete is null) return NotFound();
+
+            _dbContext.Medias.Remove(mediaItemToDelete);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

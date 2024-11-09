@@ -27,7 +27,6 @@ namespace ALMS.API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<IdentityResult>> Register([FromBody] CreateUserDto createUserDto)
         {
-
             var userToCreate = _mapper.Map<ApplicationUser>(createUserDto);
 
             await _userStore.SetUserNameAsync(userToCreate, userToCreate.Email, CancellationToken.None);
