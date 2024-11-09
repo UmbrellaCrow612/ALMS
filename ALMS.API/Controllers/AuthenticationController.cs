@@ -7,6 +7,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ALMS.API.Controllers
 {
@@ -94,7 +95,7 @@ namespace ALMS.API.Controllers
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/roles")]
-        public async Task<ActionResult> AddRoles([FromBody] IEnumerable<string> Roles, string id)
+        public async Task<ActionResult<List<IdentityRole>>> AddRoles([FromBody] IEnumerable<string> Roles, string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -114,6 +115,16 @@ namespace ALMS.API.Controllers
             await _userManager.AddToRolesAsync(user, Roles);
 
             return Ok();
+        }
+
+        [HttpGet("roles")]
+        public async Task<ActionResult> GetRoles()
+        {
+            var rolesQuery  = _roleManager.Roles;
+
+            var rolesInTheSystem = await rolesQuery.ToListAsync();
+
+            return Ok(rolesInTheSystem);
         }
     }
 
