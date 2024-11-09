@@ -25,12 +25,12 @@ namespace ALMS.API.Core
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"] ?? throw new ApplicationException("JWY Secret not added.")));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"] ?? throw new ApplicationException("JWT Key not added.")));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
+                issuer: _configuration["JWT:Issuer"] ?? throw new ApplicationException("JWT Issuer not added."),
+                audience: _configuration["JWT:Audience"] ?? throw new ApplicationException("JWT Audience not added."),
                 claims: claims,
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds

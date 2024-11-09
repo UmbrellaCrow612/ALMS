@@ -52,7 +52,6 @@ namespace ALMS.API.Controllers
             {
                 return Unauthorized("User does not exist or is not approved yet, please ask for approval");
             }
-
       
             var isValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
             if (!isValid)
