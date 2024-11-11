@@ -7,27 +7,26 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 
 namespace ALMS.API.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, JWTService jWTService) : ControllerBase
+    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, JWTService jwtService) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly IUserStore<ApplicationUser> _userStore = userStore;
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-        private readonly JWTService _jwtService = jWTService;
+        private readonly JWTService _jwtService = jwtService;
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("register")]
         public async Task<ActionResult<IdentityResult>> Register([FromBody] CreateUserDto createUserDto)
         {
-
             var userToCreate = _mapper.Map<ApplicationUser>(createUserDto);
 
             await _userStore.SetUserNameAsync(userToCreate, userToCreate.Email, CancellationToken.None);
@@ -53,64 +52,22 @@ namespace ALMS.API.Controllers
             {
                 return Unauthorized("User does not exist or is not approved yet, please ask for approval");
             }
-
-            var userRoles = await _userManager.GetRolesAsync(user);
+      
             var isValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
             if (!isValid)
             {
                 return Unauthorized();
             }
 
-            var claims = new List<Claim>
-            {
-                new(ClaimTypes.NameIdentifier, user.Id),
-                new(ClaimTypes.Email, user.Email!)
-            };
-
-            foreach (var role in userRoles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var (AccessToken, RefreshToken) = _jwtService.GenerateTokens(claims);
-
-            return Ok(new { accessToken = AccessToken, refreshToken = RefreshToken });
-        }
-
-        [AllowAnonymous]
-        [HttpPost("refresh")]
-        public async Task<ActionResult<object>> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
-        {
-            var principal = _jwtService.GetPrincipalFromExpiredToken(refreshTokenDto.RefreshToken);
-            if (principal == null)
-            {
-                return Unauthorized("Invalid refresh token");
-            }
-
-            var username = principal.Identity.Name;
-            var user = await _userManager.FindByNameAsync(username);
-            if (user == null)
-            {
-                return Unauthorized("User does not exist");
-            }
-
             var userRoles = await _userManager.GetRolesAsync(user);
-            var claims = new List<Claim>
-            { 
-                new(ClaimTypes.NameIdentifier, user.Id),
-                new(ClaimTypes.Email, user.Email!)
-            };
 
-            foreach (var role in userRoles)
+            var token = _jwtService.GenerateToken(user, userRoles);
+
+            return Ok(new
             {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var (AccessToken, RefreshToken) = _jwtService.GenerateTokens(claims);
-
-            return Ok(new { accessToken = AccessToken, refreshToken = RefreshToken });
+                accessToken = token
+            });
         }
-
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/approve")]
@@ -137,7 +94,7 @@ namespace ALMS.API.Controllers
 
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/roles")]
-        public async Task<ActionResult> AddRoles([FromBody] IEnumerable<string> Roles, string id)
+        public async Task<ActionResult<List<IdentityRole>>> AddRoles([FromBody] IEnumerable<string> Roles, string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -157,6 +114,16 @@ namespace ALMS.API.Controllers
             await _userManager.AddToRolesAsync(user, Roles);
 
             return Ok();
+        }
+
+        [HttpGet("roles")]
+        public async Task<ActionResult> GetRoles()
+        {
+            var rolesQuery  = _roleManager.Roles;
+
+            var rolesInTheSystem = await rolesQuery.ToListAsync();
+
+            return Ok(rolesInTheSystem);
         }
     }
 

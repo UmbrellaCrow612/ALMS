@@ -55,8 +55,8 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudiences = builder.Configuration.GetSection("Jwt:Audiences").Get<List<string>>(),
+        ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? throw new ApplicationException("JWT Issuer not provided"),
+        ValidAudience = builder.Configuration["Jwt:Audience"] ?? throw new ApplicationException("JWT Audience not provided"),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? throw new ApplicationException("Key not provided.")))
     };
 });

@@ -10,7 +10,7 @@
         public required string Author { get; set; }
         public required string Genre { get; set; }
         public required MediaType MediaType { get; set; }
-        public required bool IsAvailable { get; set; }
+        public required bool IsAvailable { get; set; } = true;
         public required DateTime? DateAdded { get; set; }
 
         /// <summary>
