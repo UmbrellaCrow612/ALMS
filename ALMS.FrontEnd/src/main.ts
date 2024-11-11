@@ -7,6 +7,7 @@ import LandingView from '@/views/LandingView.vue'
 import RegistrationView from './views/RegistrationView.vue'
 import LoginView from './views/LoginView.vue'
 import SearchView from './views/SearchView.vue'
+import axios from 'axios';
 
 
 
@@ -17,5 +18,7 @@ app.component('LandingView', LandingView)
 app.component('RegistrationView', RegistrationView)
 app.component('LoginView', LoginView)
 app.component('SearchView', SearchView)
+
+app.config.globalProperties.$axios = axios;
 
 app.mount('#app')
