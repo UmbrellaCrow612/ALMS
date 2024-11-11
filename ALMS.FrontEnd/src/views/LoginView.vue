@@ -127,6 +127,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { BookOpen } from 'lucide-vue-next'
+import axiosInstance from '@/plugins/axios';
 
 const router = useRouter()
 const loading = ref(false)
@@ -139,12 +140,24 @@ const form = ref({
 })
 
 const handleSubmit = async () => {
+  console.log('ran submit')
   try {
     loading.value = true
     error.value = null
     
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000))
+
+    axiosInstance.post('/auth/login', {
+      email: form.value.email,
+      password: form.value.password,
+})
+.then(response => console.log(response))
+.catch(error => console.error(error));
+
+    const random = ''
+ 
+
     
     // Mock successful login
     const user = {
@@ -160,10 +173,13 @@ const handleSubmit = async () => {
     router.push('/')
     
   } catch (err) {
-    error.value = 'Invalid email or password'
-    console.error('Login failed:', err)
+  console.error('Login failed:', err); // Logs the entire error object
+  error.value = err.response?.data?.message || 'Invalid email or password';
+
   } finally {
     loading.value = false
   }
 }
+
+
 </script>
