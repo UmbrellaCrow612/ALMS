@@ -20,11 +20,33 @@
           </div>
 
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700">
-              Full Name
+            <label for="userName" class="block text-sm font-medium text-gray-700">
+              Username
             </label>
             <div class="mt-1">
-              <input id="name" name="name" type="text" required v-model="form.name"
+              <input id="userName" name="userName" type="text" required v-model="form.userName"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="firstName" class="block text-sm font-medium text-gray-700">
+              First Name
+            </label>
+            <div class="mt-1">
+              <input id="firstName" name="firstName" type="text" required v-model="form.firstName"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="lastName" class="block text-sm font-medium text-gray-700">
+              Last Name
+            </label>
+            <div class="mt-1">
+              <input id="lastName" name="lastName" type="text" required v-model="form.lastName"
                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
@@ -47,17 +69,6 @@
             </label>
             <div class="mt-1">
               <input id="email" name="email" type="email" autocomplete="email" required v-model="form.email"
-                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label for="phone" class="block text-sm font-medium text-gray-700">
-              Phone number
-            </label>
-            <div class="mt-1">
-              <input id="phone" name="phone" type="tel" autocomplete="tel" required v-model="form.phone"
                 class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               />
             </div>
@@ -109,15 +120,15 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axiosInstance from '@/plugins/axios'; 
+import axiosInstance from '@/plugins/axios'; // Ensure this is the correct path
 
 const router = useRouter();
 
 const form = ref({
-  name: '',
+  firstName: '',
+  lastName: '',
   address: '',
   email: '',
-  phone: '',
   password: ''
 });
 
@@ -127,25 +138,32 @@ const errorMessage = ref('');
 const handleSubmit = async () => {
   successMessage.value = '';
   errorMessage.value = '';
-  
+
   try {
     const payload = {
-      userName: form.value.email,
+      userName: form.value.email, 
       email: form.value.email,
       password: form.value.password,
-      firstName: form.value.name.split(' ')[0],
-      lastName: form.value.name.split(' ').slice(1).join(' '),
+      firstName: form.value.firstName,
+      lastName: form.value.lastName,
       address: form.value.address,
     };
 
+    console.log("Payload:", payload); 
+
     const response = await axiosInstance.post('/auth/register', payload);
-    
-    if (response.status === 201) {
+
+    if (response.status === 200) {
       successMessage.value = 'You successfully created an account. Please wait for a branch librarian to approve it.';
+    } else {
+  
+      errorMessage.value = `Registration failed. Server responded with status: ${response.status}`;
     }
   } catch (error) {
-    if (error.response?.status === 401) {
-      errorMessage.value = 'Failed to register account. Please check your details and try again.';
+    console.error("Error response:", error.response?.data);
+
+    if (error.response?.status) {
+      errorMessage.value = `Registration failed. Server responded with status: ${error.response.status}`;
     } else {
       errorMessage.value = 'An unexpected error occurred. Please try again later.';
     }
