@@ -40,6 +40,7 @@
             <label for="password" class="block text-sm font-medium text-gray-700">
               Password
             </label>
+           
             <div class="mt-1">
               <input 
                 id="password" 
@@ -104,11 +105,11 @@
             </div>
             <div class="relative flex justify-center text-sm">
               <span class="px-2 bg-white text-gray-500">
-                Don't have an account?
+                Don't have an account? 
               </span>
             </div>
           </div>
-
+          
           <div class="mt-6">
             <router-link 
               to="/registration" 
@@ -123,47 +124,50 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { BookOpen } from 'lucide-vue-next'
-import axiosInstance from '@/plugins/axios'
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
+import axiosInstance from '@/plugins/axios';
 
-const router = useRouter()
-const loading = ref(false)
-const error = ref(null)
+const router = useRouter();
+const userStore = useUserStore(); 
+
+const loading = ref(false);
+const error = ref<string | null>(null);
 
 const form = ref({
   email: '',
   password: '',
-  rememberMe: false
-})
+  rememberMe: false,
+});
 
 const handleSubmit = async () => {
-  loading.value = true
-  error.value = null
-  
+  loading.value = true;
+  error.value = null;
+
   try {
     const response = await axiosInstance.post('/auth/login', {
       email: form.value.email,
       password: form.value.password,
-    })
-    
-    const { accessToken } = response.data
+    });
+
+    const { accessToken } = response.data;
     if (accessToken) {
-      localStorage.setItem('accessToken', accessToken)
-      router.push('/')
+      localStorage.setItem('accessToken', accessToken);
+      userStore.setUser(accessToken); 
+      router.push('/');
     }
   } catch (err) {
-    console.log('Full error:', err) 
-    if (err.name === 'AxiosError' && err.request?.status === 401) {
-      error.value = 'User does not exist or is not approved yet'
+    console.error('Full error:', err);
+    if (err.response?.status === 401) {
+      error.value = 'User does not exist or is not approved yet';
     } else {
-      error.value = 'An unexpected error occurred. Please try again later.'
+      error.value = 'An unexpected error occurred. Please try again later.';
     }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>
 
