@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const axiosInstance = axios.create({
   baseURL: 'https://localhost:7066',

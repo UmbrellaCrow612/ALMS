@@ -109,7 +109,7 @@
               </span>
             </div>
           </div>
-          
+
           <div class="mt-6">
             <router-link 
               to="/registration" 
@@ -128,7 +128,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/userStore';
-import axiosInstance from '@/plugins/axios';
+import axiosInstance from '@/plugins/axios.js';
 
 const router = useRouter();
 const userStore = useUserStore(); 
@@ -158,7 +158,7 @@ const handleSubmit = async () => {
       userStore.setUser(accessToken); 
       router.push('/');
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Full error:', err);
     if (err.response?.status === 401) {
       error.value = 'User does not exist or is not approved yet';
