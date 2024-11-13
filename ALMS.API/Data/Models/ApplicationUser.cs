@@ -15,7 +15,7 @@ namespace ALMS.API.Data.Models
         /// </summary>
         public bool IsApproved { get; set; } = false;
         public required MembershipStatus MembershipStatus { get; set; } = MembershipStatus.NotActive;
-        public required int MaxBorrowLimit { get; set; }
+        public required int MaxBorrowLimit { get; set; } = 10;
 
 
         /// <summary>

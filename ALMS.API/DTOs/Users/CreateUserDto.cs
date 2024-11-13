@@ -22,8 +22,5 @@ namespace ALMS.API.DTOs.Users
 
         [Required]
         public required string Address { get; set; }
-
-        [Required]
-        public required int MaxBorrowLimit { get; set; }
     }
 }

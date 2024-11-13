@@ -23,7 +23,7 @@ namespace ALMS.API.Controllers
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly JWTService _jwtService = jwtService;
 
-        [Authorize(Roles = UserRoles.BranchLibarian)]
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<IdentityResult>> Register([FromBody] CreateUserDto createUserDto)
         {
