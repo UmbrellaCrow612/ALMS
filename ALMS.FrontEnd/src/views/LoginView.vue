@@ -40,6 +40,7 @@
             <label for="password" class="block text-sm font-medium text-gray-700">
               Password
             </label>
+           
             <div class="mt-1">
               <input 
                 id="password" 
@@ -104,7 +105,7 @@
             </div>
             <div class="relative flex justify-center text-sm">
               <span class="px-2 bg-white text-gray-500">
-                Don't have an account?
+                Don't have an account? 
               </span>
             </div>
           </div>
@@ -123,63 +124,50 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { BookOpen } from 'lucide-vue-next'
-import axiosInstance from '@/plugins/axios';
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useUserStore } from '@/stores/userStore';
+import axiosInstance from '@/plugins/axios.js';
 
-const router = useRouter()
-const loading = ref(false)
-const error = ref(null)
+const router = useRouter();
+const userStore = useUserStore(); 
+
+const loading = ref(false);
+const error = ref<string | null>(null);
 
 const form = ref({
   email: '',
   password: '',
-  rememberMe: false
-})
+  rememberMe: false,
+});
 
 const handleSubmit = async () => {
-  console.log('ran submit')
-  try {
-    loading.value = true
-    error.value = null
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+  loading.value = true;
+  error.value = null;
 
-    axiosInstance.post('/auth/login', {
+  try {
+    const response = await axiosInstance.post('/auth/login', {
       email: form.value.email,
       password: form.value.password,
-})
-.then(response => console.log(response))
-.catch(error => console.error(error));
+    });
 
-    const random = ''
- 
-
-    
-    // Mock successful login
-    const user = {
-      email: form.value.email,
-      name: 'Test User',
-      id: '123'
+    const { accessToken } = response.data;
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken);
+      userStore.setUser(accessToken); 
+      router.push('/');
     }
-    
-    // Store user data
-    localStorage.setItem('user', JSON.stringify(user))
-    
-    // Redirect to dashboard
-    router.push('/')
-    
-  } catch (err) {
-  console.error('Login failed:', err); // Logs the entire error object
-  error.value = err.response?.data?.message || 'Invalid email or password';
-
+  } catch (err: any) {
+    console.error('Full error:', err);
+    if (err.response?.status === 401) {
+      error.value = 'User does not exist or is not approved yet';
+    } else {
+      error.value = 'An unexpected error occurred. Please try again later.';
+    }
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
-
-
+};
 </script>
+

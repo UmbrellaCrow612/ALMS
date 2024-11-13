@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using ALMS.API.Core;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +103,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 app.UseHttpsRedirection();
 
+StripeConfiguration.ApiKey = builder.Configuration.GetSection("Stripe:SecretKey").Get<string>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -112,9 +115,11 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     await UserRolesSeed.SeedAsync(roleManager);
     await UserSeeding.SeedAsync(userManager);
+    await StripeProductSeeding.SeedAsync(context);
 }
 
 app.Run();
