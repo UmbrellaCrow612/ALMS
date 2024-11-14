@@ -107,7 +107,7 @@ namespace ALMS.API.Controllers
         [HttpGet("users/un-approved")]
         public async Task<ActionResult> GetUnApprovedUsers()
         {
-            var users = await _userManager.Users.Where(u => u.IsApproved == false).Select(x => new { x.Id, x.UserName, x.Email }).ToListAsync();
+            var users = await _userManager.Users.Where(u => u.IsApproved == false).Select(x => new { x.Id, x.UserName, x.Email, x.FirstName, x.LastName }).ToListAsync();
 
             return Ok(users);
         }
