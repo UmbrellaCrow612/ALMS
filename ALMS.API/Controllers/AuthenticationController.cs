@@ -92,6 +92,27 @@ namespace ALMS.API.Controllers
             return Ok();
         }
 
+        [HttpPost("users/{id}/deny")]
+        public async Task<ActionResult> DenyUser(string id)
+        {
+
+            var userToDeny = await _userManager.FindByIdAsync(id);
+            if (userToDeny is null) return NotFound("User not found");
+
+            await _userManager.DeleteAsync(userToDeny);
+
+            return NoContent();
+        }
+
+        [Authorize(Roles = UserRoles.BranchLibarian)]
+        [HttpGet("users/un-approved")]
+        public async Task<ActionResult> GetUnApprovedUsers()
+        {
+            var users = await _userManager.Users.Where(u => u.IsApproved == false).Select(x => new { x.Id, x.UserName, x.Email }).ToListAsync();
+
+            return Ok(users);
+        }
+
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost("users/{id}/roles")]
         public async Task<ActionResult<List<IdentityRole>>> AddRoles([FromBody] IEnumerable<string> Roles, string id)
