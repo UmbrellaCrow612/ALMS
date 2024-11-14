@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ALMS.API.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class fixYousefBobu2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,6 +71,20 @@ namespace ALMS.API.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Medias", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StripeProducts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Product = table.Column<string>(type: "TEXT", nullable: false),
+                    Quanity = table.Column<long>(type: "INTEGER", nullable: false),
+                    Rate = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StripeProducts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -195,6 +209,47 @@ namespace ALMS.API.Migrations
                     table.PrimaryKey("PK_Payments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Payments_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StripeSessions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    SessionId = table.Column<string>(type: "TEXT", nullable: false),
+                    SessionUrl = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StripeSessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StripeSessions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Subscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Status = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Subscriptions_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
@@ -355,6 +410,16 @@ namespace ALMS.API.Migrations
                 name: "IX_Reservations_UserId",
                 table: "Reservations",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StripeSessions_UserId",
+                table: "StripeSessions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Subscriptions_UserId",
+                table: "Subscriptions",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -388,13 +453,22 @@ namespace ALMS.API.Migrations
                 name: "Reservations");
 
             migrationBuilder.DropTable(
+                name: "StripeProducts");
+
+            migrationBuilder.DropTable(
+                name: "StripeSessions");
+
+            migrationBuilder.DropTable(
+                name: "Subscriptions");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Medias");
 
             migrationBuilder.DropTable(
-                name: "Medias");
+                name: "AspNetUsers");
         }
     }
 }

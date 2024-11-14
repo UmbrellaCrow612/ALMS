@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241113182238_stripeSessions")]
-    partial class stripeSessions
+    [Migration("20241114113017_fixYousefBobu2")]
+    partial class fixYousefBobu2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -258,9 +258,8 @@ namespace ALMS.API.Migrations
 
             modelBuilder.Entity("ALMS.API.Data.Models.StripeProductEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Product")
                         .IsRequired()

@@ -255,9 +255,8 @@ namespace ALMS.API.Migrations
 
             modelBuilder.Entity("ALMS.API.Data.Models.StripeProductEntity", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Product")
                         .IsRequired()

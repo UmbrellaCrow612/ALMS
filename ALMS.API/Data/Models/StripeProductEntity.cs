@@ -7,6 +7,5 @@
         public required string Product { get; set; }
         public required long Quanity { get; set; }
         public required string Rate { get; set; }
-        public ApplicationUser? User { get; set; } = null;
     }
 }
