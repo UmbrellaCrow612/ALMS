@@ -1,8 +1,6 @@
 ﻿using ALMS.API.Core.Constants;
 using ALMS.API.Data.Models;
 using Microsoft.AspNetCore.Identity;
-using System;
-using System.Threading.Tasks;
 
 namespace ALMS.API.Data.Seeding
 {

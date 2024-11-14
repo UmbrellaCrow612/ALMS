@@ -32,7 +32,6 @@ namespace ALMS.API.Controllers
             await _userStore.SetUserNameAsync(userToCreate, userToCreate.Email, CancellationToken.None);
             await _userEmailStore.SetEmailAsync(userToCreate, userToCreate.Email, CancellationToken.None);
 
-
             var result = await _userManager.CreateAsync(userToCreate, createUserDto.Password);
 
             if (!result.Succeeded)
