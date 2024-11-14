@@ -4,18 +4,22 @@ using ALMS.API.Data.Models;
 using ALMS.API.DTOs.Media;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
+using System.Security.Claims;
 
 namespace ALMS.API.Controllers
 {
     [Authorize]
     [ApiController]
     [Route("media")]
-    public class MediaController(ApplicationDbContext dbContext, IMapper mapper) : ControllerBase
+    public class MediaController(ApplicationDbContext dbContext, IMapper mapper, UserManager<ApplicationUser> userManager) : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
         private readonly IMapper _mapper = mapper;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
 
         [HttpGet]
@@ -103,6 +107,52 @@ namespace ALMS.API.Controllers
             await _dbContext.SaveChangesAsync();
 
             return NoContent();
+        }
+
+
+        [HttpPost("{id}/borrow")]
+        public async Task<ActionResult> BorrowMedia(string id)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound("User not found");
+
+            var media = await _dbContext.Medias.FirstOrDefaultAsync(x => x.Id == id);
+            if(media is null) return NotFound("Media to borrow not found.");
+
+            if (!media.IsAvailable)
+            {
+                return BadRequest("Media is currently not Available");
+            }
+
+            int borrowedMediCount = _dbContext.BorrowTransactions.Where(x => x.UserId == userId && x.IsReturned == false).Select(x => x.Id).Count();
+
+            if (borrowedMediCount > user.MaxBorrowLimit)
+            {
+                return BadRequest("User has already borrowed more media than they are allowed, cannot borrow this media.");
+            }
+
+            BorrowTransaction borrowTransaction = new()
+            {
+                MediaId = media.Id,
+                UserId = userId,
+                DueDate = DateTime.UtcNow.AddDays(7),
+                BorrowedAt = DateTime.UtcNow,
+            };
+
+            media.IsAvailable = false;
+
+            await _dbContext.BorrowTransactions.AddAsync(borrowTransaction);
+            await _dbContext.SaveChangesAsync();
+
+
+            return Ok(new {id = borrowTransaction.Id, dueDate = borrowTransaction.DueDate , borrowedAt = borrowTransaction.BorrowedAt });
         }
     }
 }
