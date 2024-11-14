@@ -22,10 +22,6 @@ namespace ALMS.API.Data.Models
         /// Ef Core Nav Property
         /// </summary>
         public ICollection<BorrowTransaction> BorrowedItems { get; set; } = [];
-        /// <summary>
-        /// Ef Core Nav Property
-        /// </summary>
-        public ICollection<Payment> Payments { get; set; } = [];
     }
 
     public enum MembershipStatus

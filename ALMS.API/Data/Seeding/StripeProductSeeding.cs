@@ -10,7 +10,6 @@ namespace ALMS.API.Data.Seeding
    
         public static async Task SeedAsync(ApplicationDbContext dbContext)
         {
-            // Role-specific user data
             var stripeProducts = new[]
             {
                 new StripeProductEntity

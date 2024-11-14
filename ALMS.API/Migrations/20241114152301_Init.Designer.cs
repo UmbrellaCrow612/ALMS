@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241114113017_fixYousefBobu2")]
-    partial class fixYousefBobu2
+    [Migration("20241114152301_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -197,35 +197,6 @@ namespace ALMS.API.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Medias");
-                });
-
-            modelBuilder.Entity("ALMS.API.Data.Models.Payment", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsSuccessful")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("ALMS.API.Data.Models.Reservation", b =>
@@ -493,17 +464,6 @@ namespace ALMS.API.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ALMS.API.Data.Models.Payment", b =>
-                {
-                    b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
-                        .WithMany("Payments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ALMS.API.Data.Models.Reservation", b =>
                 {
                     b.HasOne("ALMS.API.Data.Models.Media", "Media")
@@ -599,8 +559,6 @@ namespace ALMS.API.Migrations
             modelBuilder.Entity("ALMS.API.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("BorrowedItems");
-
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("ALMS.API.Data.Models.Media", b =>
