@@ -18,6 +18,8 @@ namespace ALMS.API.Core
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("firstName", user.FirstName),
+                new Claim("lastName", user.LastName),
             };
 
             foreach (var role in roles)
