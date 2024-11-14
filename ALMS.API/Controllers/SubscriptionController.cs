@@ -41,8 +41,10 @@ namespace ALMS.API.Controllers
                 CancelUrl = "https://localhost:7066/swagger/index.html"
             };
 
+            var products = await _dbContext.StripeProducts.ToListAsync();
+
             // Loop through products to add them to the session
-            foreach (var product in _dbContext.StripeProducts)
+            foreach (var product in products)
             {
                 if (product.Id == id)
                 {
