@@ -110,7 +110,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Seed roles and users if necessary
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
