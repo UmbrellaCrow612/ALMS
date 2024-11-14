@@ -94,7 +94,6 @@ namespace ALMS.API.Controllers
         [HttpPost("users/{id}/deny")]
         public async Task<ActionResult> DenyUser(string id)
         {
-
             var userToDeny = await _userManager.FindByIdAsync(id);
             if (userToDeny is null) return NotFound("User not found");
 
