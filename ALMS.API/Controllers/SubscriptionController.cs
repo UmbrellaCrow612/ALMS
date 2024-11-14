@@ -126,7 +126,7 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("update/{id}")]
+        [HttpPatch("update{id}")]
         public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto,string id)
         {
 
