@@ -7,6 +7,7 @@ import LandingView from '@/views/LandingView.vue'
 import RegistrationView from './views/RegistrationView.vue'
 import LoginView from './views/LoginView.vue'
 import SearchView from './views/SearchView.vue'
+import ApprovalView from './views/ApprovalView.vue'
 import { createPinia } from 'pinia';
 import axios from 'axios';
 
@@ -21,6 +22,7 @@ app.component('LandingView', LandingView)
 app.component('RegistrationView', RegistrationView)
 app.component('LoginView', LoginView)
 app.component('SearchView', SearchView)
+app.component('ApprovalView', ApprovalView)
 
 app.config.globalProperties.$axios = axios;
 

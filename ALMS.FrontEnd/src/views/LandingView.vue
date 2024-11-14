@@ -10,24 +10,11 @@
               <span class="ml-2 text-2xl font-bold text-gray-900">AML</span>
             </div>
           </div>
-          
+
           <!-- Desktop Navigation -->
           <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-            <!-- Show different links based on authentication -->
-            <template v-if="isAuthenticated">
+            <template v-for="link in visibleLinks" :key="link.name">
               <router-link
-                v-for="link in authenticatedLinks"
-                :key="link.name"
-                :to="link.href"
-                class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-              >
-                {{ link.name }}
-              </router-link>
-            </template>
-            <template v-else>
-              <router-link 
-                v-for="link in navigationLinks" 
-                :key="link.name"
                 :to="link.href"
                 class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
               >
@@ -74,13 +61,13 @@
               </div>
             </template>
             <template v-else>
-              <button 
+              <button
                 @click="$router.push('/login')"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 mr-2"
               >
                 Login
               </button>
-              <button 
+              <button
                 @click="$router.push('/registration')"
                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
               >
@@ -91,7 +78,7 @@
 
           <!-- Mobile menu button -->
           <div class="-mr-2 flex items-center sm:hidden">
-            <button 
+            <button
               @click="isMenuOpen = !isMenuOpen"
               class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
@@ -105,44 +92,21 @@
       <!-- Mobile menu -->
       <div v-if="isMenuOpen" class="sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-          <template v-if="isAuthenticated">
+          <template v-for="link in visibleLinks" :key="link.name">
             <router-link
-              v-for="link in authenticatedLinks"
-              :key="link.name"
               :to="link.href"
               class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
             >
               {{ link.name }}
             </router-link>
-            <button
-              @click="handleLogout"
-              class="block w-full text-left pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-red-600 hover:bg-gray-50 hover:border-red-300 hover:text-red-800"
-            >
-              Sign out
-            </button>
           </template>
-          <template v-else>
-            <router-link
-              v-for="link in navigationLinks"
-              :key="link.name"
-              :to="link.href"
-              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800"
-            >
-              {{ link.name }}
-            </router-link>
-            <router-link
-              to="/login"
-              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-indigo-600 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-800"
-            >
-              Login
-            </router-link>
-            <router-link
-              to="/registration"
-              class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-indigo-600 hover:bg-gray-50 hover:border-indigo-300 hover:text-indigo-800"
-            >
-              Sign up
-            </router-link>
-          </template>
+          <button
+            v-if="isAuthenticated"
+            @click="handleLogout"
+            class="block w-full text-left pl-3 pr-4 py-2 border-l-4 text-base font-medium border-transparent text-red-600 hover:bg-gray-50 hover:border-red-300 hover:text-red-800"
+          >
+            Sign out
+          </button>
         </div>
       </div>
     </header>
@@ -188,81 +152,6 @@
           </p>
         </div>
       </div>
-
-      <!-- Search form -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <form @submit.prevent="handleSearch" class="mt-10 max-w-xl mx-auto">
-          <div class="flex rounded-md shadow-sm">
-            <input
-              v-model="searchQuery"
-              type="search"
-              placeholder="Search for books, journals, CDs, DVDs..."
-              class="flex-grow px-4 py-2 border border-gray-300 rounded-l-md focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            <button
-              type="submit"
-              class="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              <Search class="h-5 w-5" />
-              <span class="ml-2">Search</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Services section -->
-      <div class="mt-32 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center" aria-hidden="true">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center">
-            <span class="px-3 bg-gradient-to-b from-indigo-100 to-white text-lg font-medium text-gray-900">
-              Our Services
-            </span>
-          </div>
-        </div>
-
-        <div class="mt-12 grid gap-16 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-12">
-          <div
-            v-for="service in services"
-            :key="service.title"
-            :class="[
-              'rounded-lg shadow-lg overflow-hidden',
-              service.gradientClass
-            ]"
-          >
-            <div class="px-6 py-8">
-              <div class="flex items-center">
-                <component :is="service.icon" class="h-6 w-6 mr-2" />
-                <h3 class="text-lg font-medium text-white">{{ service.title }}</h3>
-              </div>
-              <p class="mt-4 text-base text-indigo-100">
-                {{ service.description }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CTA Section -->
-      <div v-if="!isAuthenticated" class="mt-32 bg-gradient-to-r from-indigo-700 to-purple-700">
-        <div class="max-w-2xl mx-auto text-center py-16 px-4 sm:py-20 sm:px-6 lg:px-8">
-          <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
-            <span class="block">Boost your knowledge.</span>
-            <span class="block">Start using AML today.</span>
-          </h2>
-          <p class="mt-4 text-lg leading-6 text-indigo-200">
-            Join our growing community of readers, researchers, and lifelong learners.
-          </p>
-          <button
-            @click="$router.push('/registration')"
-            class="mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 sm:w-auto"
-          >
-            Sign up for free
-          </button>
-        </div>
-      </div>
     </main>
 
     <!-- Footer -->
@@ -290,88 +179,41 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { BookOpen, User, Menu, X, Search, Clock } from 'lucide-vue-next'
+import { useUserStore } from '@/stores/userStore';
+import { BookOpen, User, Menu, X, Search } from 'lucide-vue-next'
 
 const router = useRouter()
+const userStore = useUserStore()
+
 const isMenuOpen = ref(false)
 const isProfileOpen = ref(false)
 const searchQuery = ref('')
-const isAuthenticated = ref(false)
-const user = ref(null)
+const isAuthenticated = computed(() => !!userStore.user)
 
-// Navigation links for non-authenticated users
-const navigationLinks = [
-  { name: 'About', href: '/about' },
-  { name: 'Services', href: '/services' },
-  { name: 'Contact', href: '/contact' }
+const roleBasedLinks = [
+  { name: 'Home', href: '/', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'Services', href: '/services', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'Contact', href: '/contact', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'Borrow', href: '/borrow', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'Inventory', href: '/inventory', roles: ['BranchLibarian'] },
+  { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian'] },
+  { name: 'Approval', href: '/approval', roles: ['BranchLibarian'] }
 ]
 
-// Additional links for authenticated users
-const authenticatedLinks = [
-  // Standard navigation links
-  { name: 'About', href: '/about' },
-  { name: 'Services', href: '/services' },
-  { name: 'Contact', href: '/contact' },
-  // Authenticated-only links
-  { name: 'Search', href: '/search' },
-  { name: 'Borrow', href: '/borrow' },
-  { name: 'Inventory', href: '/inventory' },
-  { name: 'Subscriptions', href: '/subscriptions' }
-]
+const visibleLinks = computed(() => {
+  const roles = userStore.user?.roles || []
+  return roleBasedLinks.filter(link => link.roles.some(role => roles.includes(role)))
+})
 
-const services = [
-  {
-    title: 'Vast Collection',
-    description: 'Access a wide range of books, journals, periodicals, CDs, DVDs, and multimedia titles from our extensive library network.',
-    icon: BookOpen,
-    gradientClass: 'bg-gradient-to-br from-blue-500 to-indigo-600'
-  },
-  {
-    title: 'Multiple Branches',
-    description: 'Visit our branches across all cities and towns in England for in-person services and local community engagement.',
-    icon: User,
-    gradientClass: 'bg-gradient-to-br from-purple-500 to-pink-600'
-  },
-  {
-    title: '24/7 Online Access',
-    description: 'Enjoy round-the-clock access to our online services, including search, reservations, and digital content streaming.',
-    icon: Clock,
-    gradientClass: 'bg-gradient-to-br from-green-500 to-teal-600'
-  }
-]
-
-const socialLinks = [
-  {
-    name: 'Facebook',
-    href: '#',
-    icon: 'FacebookIcon'
-  },
-  {
-    name: 'Twitter',
-    href: '#',
-    icon: 'TwitterIcon'
-  }
-]
-
-// Handle authentication
 const handleLogout = () => {
-  isAuthenticated.value = false
-  user.value = null
-  localStorage.removeItem('user')
+  userStore.clearUser()
   router.push('/login')
 }
 
-const checkAuth = () => {
-  const savedUser = localStorage.getItem('user')
-  if (savedUser) {
-    user.value = JSON.parse(savedUser)
-    isAuthenticated.value = true
-  }
-}
-
-// Handle search
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
     router.push({
@@ -381,15 +223,9 @@ const handleSearch = () => {
   }
 }
 
-// Close dropdown when clicking outside
 onMounted(() => {
-  checkAuth() // Check authentication status on mount
-  
   document.addEventListener('click', (event) => {
-    const dropdown = document.querySelector('.relative')
-    if (dropdown && !dropdown.contains(event.target)) {
-      isProfileOpen.value = false
-    }
+    if (!event.target.closest('.relative')) isProfileOpen.value = false
   })
 })
 </script>
