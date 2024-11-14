@@ -13,7 +13,6 @@ namespace ALMS.API.Data
         public DbSet<Media> Medias { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
-        public DbSet<StripeProductEntity> StripeProducts { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -253,28 +253,6 @@ namespace ALMS.API.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("ALMS.API.Data.Models.StripeProductEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Product")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long>("Quanity")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Rate")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StripeProducts");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")

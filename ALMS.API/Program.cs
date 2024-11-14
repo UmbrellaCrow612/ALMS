@@ -115,11 +115,9 @@ using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
     await UserRolesSeed.SeedAsync(roleManager);
     await UserSeeding.SeedAsync(userManager);
-    await StripeProductSeeding.SeedAsync(context);
 }
 
 app.Run();
