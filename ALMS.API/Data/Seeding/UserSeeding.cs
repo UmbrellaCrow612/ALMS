@@ -39,23 +39,21 @@ namespace ALMS.API.Data.Seeding
 
                     var result = await userManager.CreateAsync(newUser, user.Password);
 
-                    if (result.Succeeded)
+                    if (!result.Succeeded)
                     {
-                        if (!await userManager.IsInRoleAsync(newUser, user.Role))
-                        {
-                            await userManager.AddToRoleAsync(newUser, user.Role);
-                        }
-                        else
-                        {
-                        
-                        }
-                    }
-                    else
-                    {
-                       
+                        throw new ApplicationException("Failed to make user in DB");
                     }
                 }
+
+                var createdUser = await userManager.FindByEmailAsync(user.Email) ?? throw new ApplicationException("User dose not exist");
+
+                if (!await userManager.IsInRoleAsync(createdUser, user.Role))
+                {
+                    await userManager.AddToRoleAsync(createdUser, user.Role);
+                }
             }
+
+
         }
     }
 }
