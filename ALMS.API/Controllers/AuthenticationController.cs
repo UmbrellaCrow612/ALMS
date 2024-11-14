@@ -40,7 +40,7 @@ namespace ALMS.API.Controllers
                 return BadRequest(result);
             }
 
-            return Ok();
+            return Ok(new {id = userToCreate.Id});
         }
 
         [AllowAnonymous]

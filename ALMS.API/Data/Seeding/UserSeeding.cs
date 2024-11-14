@@ -41,7 +41,7 @@ namespace ALMS.API.Data.Seeding
 
                     if (result.Succeeded)
                     {
-                        if (await userManager.IsInRoleAsync(newUser, user.Role))
+                        if (!await userManager.IsInRoleAsync(newUser, user.Role))
                         {
                             await userManager.AddToRoleAsync(newUser, user.Role);
                         }
