@@ -44,7 +44,7 @@ namespace ALMS.API.Controllers
             // Loop through products to add them to the session
             foreach (var product in _dbContext.StripeProducts)
             {
-                if (product.Id == id) 
+                if (product.Id == id)
                 {
                     decimal price = decimal.TryParse(product.Rate.Replace("£", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result) ? result : 0m;
                     var sessionListItem = new SessionLineItemOptions
@@ -126,8 +126,8 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("update{id}")]
-        public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto,string id)
+        [HttpPatch("update/{id}")]
+        public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto, string id)
         {
 
             var subscriptonToUpdate = await _dbContext.Subscriptions.FirstOrDefaultAsync(x => x.Id == id);
