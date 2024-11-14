@@ -87,7 +87,10 @@ namespace ALMS.API.Controllers
         public async Task<ActionResult> GetSubscribersDetails()
         {
             List<Subscription> subscriptions = [];
-            foreach (var stripeSession in _dbContext.StripeSessions)
+
+            var stripeSessions = await _dbContext.StripeSessions.ToListAsync();
+
+            foreach (var stripeSession in stripeSessions)
             {
                 var sessionId = stripeSession.SessionId;
                 var service = new Stripe.Checkout.SessionService();
