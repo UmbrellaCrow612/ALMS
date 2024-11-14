@@ -15,7 +15,7 @@ namespace ALMS.API.Data.Seeding
             {
                 new StripeProductEntity
                 {
-                    Id = 1,
+                    Id = "1",
                     Product = "Advance Libary System Subscription (Basic)",
                     Rate = "£4.99",
                     Quanity = 1
