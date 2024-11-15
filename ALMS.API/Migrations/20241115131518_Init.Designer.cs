@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241114152301_Init")]
+    [Migration("20241115131518_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -180,7 +180,18 @@ namespace ALMS.API.Migrations
                     b.Property<DateTime?>("DateAdded")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Genre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ISBN")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImgUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -189,6 +200,9 @@ namespace ALMS.API.Migrations
 
                     b.Property<int>("MediaType")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()

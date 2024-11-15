@@ -177,7 +177,18 @@ namespace ALMS.API.Migrations
                     b.Property<DateTime?>("DateAdded")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Genre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ISBN")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ImgUrl")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -186,6 +197,9 @@ namespace ALMS.API.Migrations
 
                     b.Property<int>("MediaType")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()

@@ -62,6 +62,10 @@ namespace ALMS.API.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Title = table.Column<string>(type: "TEXT", nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    PublishedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ISBN = table.Column<string>(type: "TEXT", nullable: true),
+                    ImgUrl = table.Column<string>(type: "TEXT", nullable: false),
                     Author = table.Column<string>(type: "TEXT", nullable: false),
                     Genre = table.Column<string>(type: "TEXT", nullable: false),
                     MediaType = table.Column<int>(type: "INTEGER", nullable: false),
