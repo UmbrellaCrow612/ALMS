@@ -4,7 +4,6 @@
     <main class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-indigo-800 mb-6">Media Inventory</h1>
 
-      <!-- Search and Add Media -->
       <div class="mb-6 flex justify-between items-center">
         <input
           type="search"
@@ -20,7 +19,6 @@
         </button>
       </div>
 
-      <!-- Inventory Table -->
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -62,7 +60,6 @@
         </table>
       </div>
 
-      <!-- Add/Edit Modal -->
       <Modal v-if="isModalOpen" @close="closeModal">
         <template #header>
           <h2 class="text-xl font-semibold">{{ editingMedia ? 'Edit Media' : 'Add Media' }}</h2>
@@ -163,18 +160,20 @@ const loadInventory = async () => {
 const handleSubmit = async () => {
   try {
     if (editingMedia.value) {
-      await axiosInstance.patch(`/media/${editingMedia.value.id}`, formData.value)
-      const updatedItem = inventory.value.find((item) => item.id === editingMedia.value.id)
-      Object.assign(updatedItem, formData.value)
+  
+      await axiosInstance.patch(`/media/${editingMedia.value.id}`, formData.value);
+      const updatedItem = inventory.value.find((item) => item.id === editingMedia.value.id);
+      Object.assign(updatedItem, formData.value);
     } else {
-      const response = await axiosInstance.post('/media', formData.value)
-      inventory.value.push(response.data)
+  
+      await axiosInstance.post('/media', formData.value);
     }
-    closeModal()
+    closeModal();
+    await loadInventory(); 
   } catch (error) {
-    console.error('Failed to save media:', error)
+    console.error('Failed to save media:', error);
   }
-}
+};
 
 const deleteMedia = async (id) => {
   try {

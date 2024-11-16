@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
     <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
       <!-- Header Section -->
       <div class="flex justify-between items-center border-b pb-3 mb-4">
@@ -33,18 +33,11 @@
 </template>
 
 <script setup>
-defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true,
-  },
-});
-
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close'])
 
 const close = () => {
-  emit('close');
-};
+  emit('close')
+}
 </script>
 
 <style scoped>
