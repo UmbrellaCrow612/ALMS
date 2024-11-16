@@ -5,6 +5,7 @@ import LoginView from '@/views/LoginView.vue'
 import SearchView from '@/views/SearchView.vue'
 import MediaDetail from '@/views/MediaDetail.vue'
 import ApprovalView from '@/views/ApprovalView.vue'
+import InventoryView from '@/views/InventoryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,12 @@ const router = createRouter({
       path: '/approval',
       name: 'approval',
       component: ApprovalView,
+      props: true,  
+    },
+    {
+      path: '/inventory',
+      name: 'inventroy',
+      component: InventoryView,
       props: true,  
     },
   ]

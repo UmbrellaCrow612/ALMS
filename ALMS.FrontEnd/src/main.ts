@@ -10,6 +10,7 @@ import SearchView from './views/SearchView.vue'
 import ApprovalView from './views/ApprovalView.vue'
 import { createPinia } from 'pinia';
 import axios from 'axios';
+import InventoryView from './views/InventoryView.vue'
 
 
 
@@ -23,6 +24,7 @@ app.component('RegistrationView', RegistrationView)
 app.component('LoginView', LoginView)
 app.component('SearchView', SearchView)
 app.component('ApprovalView', ApprovalView)
+app.component('InventoryView', InventoryView)
 
 app.config.globalProperties.$axios = axios;
 
