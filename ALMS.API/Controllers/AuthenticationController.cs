@@ -39,7 +39,7 @@ namespace ALMS.API.Controllers
                 return BadRequest(result);
             }
 
-            return Ok(new {id = userToCreate.Id});
+            return Ok(new {id = userToCreate.Id });
         }
 
         [AllowAnonymous]
@@ -87,6 +87,8 @@ namespace ALMS.API.Controllers
             user.IsApproved = true;
 
             await _userStore.UpdateAsync(user, CancellationToken.None);
+
+            await _userManager.AddToRoleAsync(user, UserRoles.LibaryMember);
 
             return Ok();
         }
