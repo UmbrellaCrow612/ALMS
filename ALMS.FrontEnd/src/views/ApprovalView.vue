@@ -1,5 +1,6 @@
 <template>
     <div class="container mx-auto py-10 px-4">
+      <NavBar></NavBar>
       <h1 class="text-2xl font-bold mb-6 text-center">User Approval Page</h1>
       <div v-if="loading" class="text-center">Loading users...</div>
       <div v-else-if="users.length === 0" class="text-center">No users pending approval.</div>
@@ -75,6 +76,7 @@
   <script setup>
   import { ref, onMounted } from 'vue';
   import axiosInstance from '@/plugins/axios'; 
+import NavBar from '@/components/NavBar.vue';
   
   const users = ref([]);
   const loading = ref(true);

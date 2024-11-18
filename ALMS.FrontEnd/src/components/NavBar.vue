@@ -126,10 +126,8 @@
   const roleBasedLinks = [
     { name: 'Home', href: '/', roles: ['LibaryMember', 'BranchLibarian'] },
     { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian'] },
-    { name: 'Services', href: '/services', roles: ['LibaryMember', 'BranchLibarian'] },
     { name: 'Contact', href: '/contact', roles: ['LibaryMember', 'BranchLibarian'] },
     { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian'] },
-    { name: 'Borrow', href: '/borrow', roles: ['LibaryMember', 'BranchLibarian'] },
     { name: 'Inventory', href: '/inventory', roles: ['BranchLibarian'] },
     { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian'] },
     { name: 'Approval', href: '/approval', roles: ['BranchLibarian'] },

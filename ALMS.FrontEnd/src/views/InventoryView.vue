@@ -89,7 +89,7 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Published At</label>
-                <input v-model="formData.publishedAt" type="date" class="p-2 border rounded w-full" required />
+               <input v-model="formData.publishedAt" type="date" class="p-2 border rounded w-full" required />
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Media Type</label>
@@ -158,21 +158,26 @@ const loadInventory = async () => {
 }
 
 const handleSubmit = async () => {
-  try {
-    if (editingMedia.value) {
-  
-      await axiosInstance.patch(`/media/${editingMedia.value.id}`, formData.value);
-      const updatedItem = inventory.value.find((item) => item.id === editingMedia.value.id);
-      Object.assign(updatedItem, formData.value);
-    } else {
-  
-      await axiosInstance.post('/media', formData.value);
-    }
-    closeModal();
-    await loadInventory(); 
-  } catch (error) {
-    console.error('Failed to save media:', error);
-  }
+ try {
+   // Convert the date back to UTC format before sending
+   const formattedData = {
+     ...formData.value,
+     publishedAt: new Date(formData.value.publishedAt).toISOString()
+   };
+
+   if (editingMedia.value) {
+    console.log(formattedData)
+     await axiosInstance.patch(`/media/${editingMedia.value.id}`, formattedData);
+     const updatedItem = inventory.value.find((item) => item.id === editingMedia.value.id);
+     Object.assign(updatedItem, formattedData);
+   } else {
+     await axiosInstance.post('/media', formattedData);
+   }
+   closeModal();
+   await loadInventory();
+ } catch (error) {
+   console.error('Failed to save media:', error);
+ }
 };
 
 const deleteMedia = async (id) => {
@@ -201,7 +206,11 @@ const openAddModal = () => {
 
 const openEditModal = (media) => {
   editingMedia.value = media
-  formData.value = { ...media }
+  const date = new Date(media.publishedAt);
+  formData.value = { 
+    ...media,
+    publishedAt: date.toISOString().split('T')[0]  // Converts to YYYY-MM-DD
+  };
   isModalOpen.value = true
 }
 

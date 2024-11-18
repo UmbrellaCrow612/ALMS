@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: LandingView
+      component: LandingView,
     },
     {
       path: '/registration',

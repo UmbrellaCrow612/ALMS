@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-100">
+    <NavBar></NavBar>
     <main class="container mx-auto px-4 py-8">
       <div class="grid gap-6 lg:grid-cols-3">
         <!-- Left Column - Media Photo and Borrow History -->
@@ -66,7 +67,7 @@
                   <span class="font-medium">ISBN:</span> {{ mediaDetails.isbn }}
                 </div>
                 <div>
-                  <span class="font-medium">Available:</span> {{ mediaDetails.availableCopies }} of {{ mediaDetails.totalCopies }}
+                  <span class="font-medium">Availability:</span> {{ mediaDetails.isAvailable }} 
                 </div>
               </div>
             </div>
@@ -94,10 +95,18 @@
 
           <!-- Reserve and Borrow Buttons -->
           <div class="flex justify-end gap-4">
-            <button @click="reserveItem" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+            <button 
+              @click="reserveItem" 
+              :disabled="!mediaDetails.isAvailable" 
+              class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 disabled:bg-gray-200 disabled:cursor-not-allowed"
+            >
               Reserve
             </button>
-            <button @click="borrowItem" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+            <button 
+              @click="borrowItem" 
+              :disabled="!mediaDetails.isAvailable" 
+              class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed"
+            >
               Borrow
             </button>
           </div>
@@ -107,11 +116,13 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import axiosInstance from '@/plugins/axios';
 import { Clock, Calendar, User } from 'lucide-vue-next';
+import NavBar from '@/components/NavBar.vue';
 
 const route = useRoute();
 const mediaDetails = ref({});
@@ -124,8 +135,12 @@ const loadMediaDetails = async () => {
     mediaDetails.value = response.data;
 
     const similarResponse = await axiosInstance.get('/media', {
-      params: { Genre: mediaDetails.value.genre },
+      params: {
+        MediaType: mediaDetails.value.mediaType,
+        Genre: mediaDetails.value.genre,
+      },
     });
+    
     similarItems.value = similarResponse.data.filter((item) => item.id !== mediaDetails.value.id);
   } catch (error) {
     console.error('Failed to load media details:', error);
@@ -149,6 +164,8 @@ const borrowItem = async () => {
 
 onMounted(loadMediaDetails);
 </script>
+
+
 
 <style scoped>
 .container {
