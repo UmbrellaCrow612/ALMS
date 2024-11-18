@@ -120,6 +120,7 @@ using (var scope = app.Services.CreateScope())
     await UserRolesSeed.SeedAsync(roleManager);
     await UserSeeding.SeedAsync(userManager);
     await StripeProductSeeding.SeedAsync(context);
+    await MediaSeeding.SeedAsync(context);
 
 }
 
