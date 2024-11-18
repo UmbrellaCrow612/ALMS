@@ -34,6 +34,19 @@ namespace ALMS.API.Data.Seeding
                     MediaType = MediaType.Book,
                     PublishedAt = DateTime.Now,
                     Title = "Sayings and anecdotes",
+                },
+                  new() {
+                    Id = "8432759823759235",
+                    Author = "Sami",
+                    DateAdded = DateTime.Now,
+                    Description = "A book about sami",
+                    Genre = "Sami",
+                    ImgUrl = "https://picsum.photos/200/300",
+                    IsAvailable = false,
+                    ISBN = "241092401",
+                    MediaType = MediaType.Book,
+                    PublishedAt = DateTime.Now,
+                    Title = "Sayings and Sami",
                 }
             ];
 
