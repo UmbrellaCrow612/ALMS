@@ -138,8 +138,6 @@ namespace ALMS.API.Controllers
                 return BadRequest("User has already borrowed more media than they are allowed, cannot borrow this media.");
             }
 
-            // check reservation of the media is media
-
             BorrowTransaction borrowTransaction = new()
             {
                 MediaId = media.Id,
@@ -153,8 +151,8 @@ namespace ALMS.API.Controllers
             await _dbContext.BorrowTransactions.AddAsync(borrowTransaction);
             await _dbContext.SaveChangesAsync();
 
-
             return Ok(new {id = borrowTransaction.Id, dueDate = borrowTransaction.DueDate , borrowedAt = borrowTransaction.BorrowedAt });
         }
+
     }
 }
