@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using ALMS.API.Core;
 using Stripe;
+using ALMS.API.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -83,7 +84,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     // Customize Identity options if necessary
 })
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(cfg =>
 {
@@ -91,6 +93,7 @@ builder.Services.AddAutoMapper(cfg =>
 });
 
 builder.Services.AddSingleton<JWTService>();
+builder.Services.AddSingleton<RandomStringGenerator>();
 
 var app = builder.Build();
 

@@ -136,6 +136,32 @@ namespace ALMS.API.Migrations
                     b.ToTable("BorrowTransactions");
                 });
 
+            modelBuilder.Entity("ALMS.API.Data.Models.ForgotPasswordAttempt", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSuccessful")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ForgotPasswordAttempts");
+                });
+
             modelBuilder.Entity("ALMS.API.Data.Models.InventoryLog", b =>
                 {
                     b.Property<string>("Id")
@@ -456,6 +482,17 @@ namespace ALMS.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ALMS.API.Data.Models.ForgotPasswordAttempt", b =>
+                {
+                    b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
+                        .WithMany("ForgotPasswordAttempts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ALMS.API.Data.Models.InventoryLog", b =>
                 {
                     b.HasOne("ALMS.API.Data.Models.Media", "Media")
@@ -570,6 +607,8 @@ namespace ALMS.API.Migrations
             modelBuilder.Entity("ALMS.API.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("BorrowedItems");
+
+                    b.Navigation("ForgotPasswordAttempts");
                 });
 
             modelBuilder.Entity("ALMS.API.Data.Models.Media", b =>

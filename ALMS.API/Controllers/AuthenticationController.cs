@@ -1,8 +1,10 @@
 ﻿using ALMS.API.Core;
 using ALMS.API.Core.Constants;
+using ALMS.API.Data;
 using ALMS.API.Data.Models;
 using ALMS.API.DTOs.Auth;
 using ALMS.API.DTOs.Users;
+using ALMS.API.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +16,7 @@ namespace ALMS.API.Controllers
     [Authorize]
     [ApiController]
     [Route("auth")]
-    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, JWTService jwtService) : ControllerBase
+    public class AuthenticationController(IMapper mapper, UserManager<ApplicationUser> userManager, IUserStore<ApplicationUser> userStore, RoleManager<IdentityRole> roleManager, JWTService jwtService, RandomStringGenerator randomStringGenerator, ApplicationDbContext dbContext) : ControllerBase
     {
         private readonly IMapper _mapper = mapper;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -22,6 +24,8 @@ namespace ALMS.API.Controllers
         private readonly IUserEmailStore<ApplicationUser> _userEmailStore = (IUserEmailStore<ApplicationUser>)userStore;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         private readonly JWTService _jwtService = jwtService;
+        private readonly RandomStringGenerator _randomStringGenerator = randomStringGenerator;
+        private readonly ApplicationDbContext _dbContext = dbContext;
 
         [AllowAnonymous]
         [HttpPost("register")]
@@ -145,6 +149,70 @@ namespace ALMS.API.Controllers
             var rolesInTheSystem = await rolesQuery.ToListAsync();
 
             return Ok(rolesInTheSystem);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+            if (user is null) return Ok(); // we don't reveal if the user exists
+
+            var cantMakeAttempt = await _dbContext.ForgotPasswordAttempts
+                .AnyAsync(x => x.UserId == user.Id &&
+                           x.IsSuccessful == false &&
+                           x.CreatedAt > DateTime.UtcNow.AddMinutes(-30));
+
+            if (cantMakeAttempt) return Ok(); // Already made an attempt within 30 minutes so we do not send a new one.
+
+            var code = _randomStringGenerator.Generate(20);
+
+            var attempt = new ForgotPasswordAttempt
+            {
+                UserId = user.Id,
+                Code = code,
+            };
+
+            var emailService = new EmailService();
+          
+            emailService.SendEmail(user.Email!, "Forgot password", $"http://localhost:5173/forgot-password/{code}");
+
+            // they will go there and put there new password and confirm
+            // they will send the code, and new password
+            // we will check code is valid and new password and then change the password
+
+
+            _dbContext.ForgotPasswordAttempts.Add(attempt);
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(code);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("forgot-password/{code}")]
+        public async Task<ActionResult> ConfirmForgotPassword([FromBody] ConfirmForgotPasswordDto confirmForgotPasswordDto, string code)
+        {
+            var attempt = await _dbContext.ForgotPasswordAttempts.Where(x => x.Code == code).FirstOrDefaultAsync();
+
+            if (attempt is null) return NotFound("Attempt not found.");
+
+            if (DateTime.UtcNow - attempt.CreatedAt > TimeSpan.FromMinutes(30))
+                return BadRequest("Password reset attempt has expired.");
+
+            var user = await _userManager.FindByIdAsync(attempt.UserId);
+            if (user is null) return NotFound("User not found.");
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, confirmForgotPasswordDto.NewPassword);
+
+            if (!result.Succeeded) return BadRequest(result.Errors);
+
+            attempt.IsSuccessful = true;
+
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 

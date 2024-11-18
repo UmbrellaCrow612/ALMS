@@ -198,6 +198,27 @@ namespace ALMS.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ForgotPasswordAttempts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsSuccessful = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Code = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ForgotPasswordAttempts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ForgotPasswordAttempts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StripeSessions",
                 columns: table => new
                 {
@@ -369,6 +390,11 @@ namespace ALMS.API.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ForgotPasswordAttempts_UserId",
+                table: "ForgotPasswordAttempts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InventoryLogs_MediaId",
                 table: "InventoryLogs",
                 column: "MediaId");
@@ -419,6 +445,9 @@ namespace ALMS.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "BorrowTransactions");
+
+            migrationBuilder.DropTable(
+                name: "ForgotPasswordAttempts");
 
             migrationBuilder.DropTable(
                 name: "InventoryLogs");
