@@ -6,11 +6,11 @@ import SearchView from '@/views/SearchView.vue'
 import MediaDetail from '@/views/MediaDetail.vue'
 import ApprovalView from '@/views/ApprovalView.vue'
 import InventoryView from '@/views/InventoryView.vue'
-
+import AboutView from '@/views/AboutView.vue'
 
 const isAuthenticated = () => {
   
-  return localStorage.getItem('authToken') !== null; 
+  return localStorage.getItem('accessToken') !== null; 
 }
 
 const router = createRouter({
@@ -56,6 +56,12 @@ const router = createRouter({
       name: 'inventory',
       component: InventoryView,
       props: true,
+      meta: { requiresAuth: true }, 
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: AboutView,
       meta: { requiresAuth: true }, 
     },
   ],
