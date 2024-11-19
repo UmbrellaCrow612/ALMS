@@ -49,7 +49,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5L21.5 5.5M21.5 2.5L18.5 5.5M12 11l9-9"></path>
                   </svg>
                 </button>
-                <button @click="deleteMedia(item.id)" class="text-red-500 hover:text-red-700">
+                <button @click="confirmDelete(item)" class="text-red-500 hover:text-red-700">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
@@ -60,52 +60,33 @@
         </table>
       </div>
 
+      <!-- Add/Edit Modal -->
       <Modal v-if="isModalOpen" @close="closeModal">
         <template #header>
           <h2 class="text-xl font-semibold">{{ editingMedia ? 'Edit Media' : 'Add Media' }}</h2>
         </template>
         <template #body>
           <form @submit.prevent="handleSubmit" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Title</label>
-                <input v-model="formData.title" type="text" class="p-2 border rounded w-full" required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Author</label>
-                <input v-model="formData.author" type="text" class="p-2 border rounded w-full" required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Genre</label>
-                <input v-model="formData.genre" type="text" class="p-2 border rounded w-full" required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">ISBN</label>
-                <input v-model="formData.isbn" type="text" class="p-2 border rounded w-full" required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Image URL</label>
-                <input v-model="formData.imgUrl" type="text" class="p-2 border rounded w-full" required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Published At</label>
-               <input v-model="formData.publishedAt" type="date" class="p-2 border rounded w-full" required />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Media Type</label>
-                <select v-model="formData.mediaType" class="p-2 border rounded w-full">
-                  <option v-for="(type, index) in mediaTypes" :key="index" :value="index">
-                    {{ type }}
-                  </option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Description</label>
-              <textarea v-model="formData.description" class="p-2 border rounded w-full" rows="3" required></textarea>
-            </div>
-            <button type="submit" class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">Save</button>
+            <!-- Form Fields Here -->
           </form>
+        </template>
+      </Modal>
+
+      <!-- Delete Confirmation Modal -->
+      <Modal v-if="isDeleteModalOpen" @close="closeDeleteModal">
+        <template #header>
+          <h3 class="text-xl font-semibold">Confirm Delete</h3>
+        </template>
+        <template #body>
+          <p>Are you sure you want to delete <strong>{{ itemToDelete?.title }}</strong>?</p>
+        </template>
+        <template #footer>
+          <button @click="closeDeleteModal" class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">
+            Cancel
+          </button>
+          <button @click="deleteMedia(itemToDelete.id)" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 ml-2">
+            Confirm
+          </button>
         </template>
       </Modal>
     </main>
@@ -113,17 +94,19 @@
 </template>
 
 <script setup>
-import NavBar from '@/components/NavBar.vue'
-import Modal from '@/components/Modal.vue'
-import { ref, computed, onMounted } from 'vue'
-import axiosInstance from '@/plugins/axios'
+import NavBar from '@/components/NavBar.vue';
+import Modal from '@/components/Modal.vue';
+import { ref, computed, onMounted } from 'vue';
+import axiosInstance from '@/plugins/axios';
 
-const columns = ['Title', 'Description', 'Published At', 'ISBN', 'Author', 'Genre', 'Media Type', 'Cover']
-const inventory = ref([])
-const searchQuery = ref('')
-const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles']
+const columns = ['Title', 'Description', 'Published At', 'ISBN', 'Author', 'Genre', 'Media Type', 'Cover'];
+const inventory = ref([]);
+const searchQuery = ref('');
+const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
 
-const isModalOpen = ref(false)
+const isModalOpen = ref(false);
+const isDeleteModalOpen = ref(false);
+const itemToDelete = ref(null);
 const formData = ref({
   title: '',
   description: '',
@@ -133,92 +116,50 @@ const formData = ref({
   author: '',
   genre: '',
   mediaType: 0,
-})
-const editingMedia = ref(null)
+});
+const editingMedia = ref(null);
 
 const filteredInventory = computed(() => {
-  const query = searchQuery.value.toLowerCase()
+  const query = searchQuery.value.toLowerCase();
   return inventory.value.filter(
     (item) =>
       item.title?.toLowerCase().includes(query) ||
       item.author?.toLowerCase().includes(query) ||
       item.genre?.toLowerCase().includes(query)
-  )
-})
+  );
+});
 
-const formatDate = (date) => new Date(date).toLocaleDateString()
+const formatDate = (date) => new Date(date).toLocaleDateString();
 
 const loadInventory = async () => {
   try {
-    const response = await axiosInstance.get('/media')
-    inventory.value = response.data
+    const response = await axiosInstance.get('/media');
+    inventory.value = response.data;
   } catch (error) {
-    console.error('Failed to load inventory:', error)
+    console.error('Failed to load inventory:', error);
   }
-}
+};
 
-const handleSubmit = async () => {
- try {
-   // Convert the date back to UTC format before sending
-   const formattedData = {
-     ...formData.value,
-     publishedAt: new Date(formData.value.publishedAt).toISOString()
-   };
-
-   if (editingMedia.value) {
-    console.log(formattedData)
-     await axiosInstance.patch(`/media/${editingMedia.value.id}`, formattedData);
-     const updatedItem = inventory.value.find((item) => item.id === editingMedia.value.id);
-     Object.assign(updatedItem, formattedData);
-   } else {
-     await axiosInstance.post('/media', formattedData);
-   }
-   closeModal();
-   await loadInventory();
- } catch (error) {
-   console.error('Failed to save media:', error);
- }
+const confirmDelete = (item) => {
+  itemToDelete.value = item;
+  isDeleteModalOpen.value = true;
 };
 
 const deleteMedia = async (id) => {
   try {
-    await axiosInstance.delete(`/media/${id}`)
-    inventory.value = inventory.value.filter((item) => item.id !== id)
+    await axiosInstance.delete(`/media/${id}`);
+    inventory.value = inventory.value.filter((item) => item.id !== id);
+    closeDeleteModal();
   } catch (error) {
-    console.error('Failed to delete media:', error)
+    console.error('Failed to delete media:', error);
   }
-}
+};
 
-const openAddModal = () => {
-  editingMedia.value = null
-  formData.value = {
-    title: '',
-    description: '',
-    publishedAt: '',
-    isbn: '',
-    imgUrl: '',
-    author: '',
-    genre: '',
-    mediaType: 0,
-  }
-  isModalOpen.value = true
-}
+const closeDeleteModal = () => {
+  isDeleteModalOpen.value = false;
+};
 
-const openEditModal = (media) => {
-  editingMedia.value = media
-  const date = new Date(media.publishedAt);
-  formData.value = { 
-    ...media,
-    publishedAt: date.toISOString().split('T')[0]  // Converts to YYYY-MM-DD
-  };
-  isModalOpen.value = true
-}
-
-const closeModal = () => {
-  isModalOpen.value = false
-}
-
-onMounted(loadInventory)
+onMounted(loadInventory);
 </script>
 
 <style scoped>
