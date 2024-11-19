@@ -7,6 +7,12 @@ import MediaDetail from '@/views/MediaDetail.vue'
 import ApprovalView from '@/views/ApprovalView.vue'
 import InventoryView from '@/views/InventoryView.vue'
 
+
+const isAuthenticated = () => {
+  
+  return localStorage.getItem('authToken') !== null; 
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -18,37 +24,50 @@ const router = createRouter({
     {
       path: '/registration',
       name: 'registration',
-      component: RegistrationView
+      component: RegistrationView,
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
     },
     {
       path: '/search',
       name: 'search',
-      component: SearchView
+      component: SearchView,
+      meta: { requiresAuth: true }, 
     },
     {
       path: '/media/:id',
       name: 'mediaDetail',
       component: MediaDetail,
-      props: true,  
+      props: true,
+      meta: { requiresAuth: true }, 
     },
     {
       path: '/approval',
       name: 'approval',
       component: ApprovalView,
-      props: true,  
+      props: true,
+      meta: { requiresAuth: true }, 
     },
     {
       path: '/inventory',
-      name: 'inventroy',
+      name: 'inventory',
       component: InventoryView,
-      props: true,  
+      props: true,
+      meta: { requiresAuth: true }, 
     },
-  ]
+  ],
+})
+
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    next({ name: 'login' }) 
+  } else {
+    next() 
+  }
 })
 
 export default router
