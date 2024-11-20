@@ -70,6 +70,21 @@ namespace ALMS.API.Controllers
             return Ok(mediaDto);
         }
 
+        [HttpGet("{id}/history")]
+        public async Task<ActionResult> MediaHistory(string id)
+        {
+            var mediaExists = await _dbContext.Medias.AnyAsync(m => m.Id == id);
+            if (!mediaExists) return NotFound("Media not found.");
+
+            var history = await _dbContext.BorrowTransactions
+                             .Where(x => x.MediaId == id && x.IsReturned == true)
+                             .OrderByDescending(x => x.ReturnedAt)
+                             .Select(x => x.BorrowedAt)
+                             .ToListAsync();
+
+            return Ok(history);
+        }
+
         [Authorize(Roles = UserRoles.BranchLibarian)]
         [HttpPost]
         public async Task<ActionResult> CreateMediaItem([FromBody] CreateMediaDto createMediaDto)
