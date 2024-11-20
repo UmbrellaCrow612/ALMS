@@ -22,17 +22,29 @@
               <Clock class="mr-3 h-5 w-5 text-slate-600" />
               Borrow History
             </h2>
-            <div class="space-y-5">
+            <div v-if="loadingHistory" class="text-center py-6">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
+              <p class="mt-2 text-slate-600">Loading history...</p>
+            </div>
+            <div v-else-if="historyError" class="text-red-600 text-center py-6">
+              {{ historyError }}
+            </div>
+            <div v-else-if="borrowHistory.length === 0" class="text-slate-600 text-center py-6">
+              No borrow history available.
+            </div>
+            <div v-else class="space-y-5">
               <div
-                v-for="(history, index) in mediaDetails.borrowHistory"
+                v-for="(history, index) in borrowHistory"
                 :key="index"
                 class="flex items-center justify-between text-sm"
               >
-                <div class="flex items-center text-slate-600">
-                  <Calendar class="mr-2 h-4 w-4" />
-                  <span>{{ history.date }}</span>
-                </div>
-                <span class="font-medium text-emerald-600">{{ history.status }}</span>
+          
+                <span
+                  :class="history.status === 'Returned' ? 'text-emerald-600' : 'text-blue-600'"
+                  class="font-medium"
+                >
+                  {{  new Date(history) }}
+                </span>
               </div>
             </div>
           </div>
@@ -45,7 +57,9 @@
             <div class="space-y-6">
               <div class="flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-slate-900">{{ mediaDetails.title }}</h1>
-                <span class="px-3 py-1 text-sm font-medium bg-slate-100 text-slate-700 rounded-full">{{ mediaTypes[mediaDetails.mediaType] }}</span>
+                <span class="px-3 py-1 text-sm font-medium bg-slate-100 text-slate-700 rounded-full">
+                  {{ mediaTypes[mediaDetails.mediaType] }}
+                </span>
               </div>
               <div class="flex items-center text-slate-600">
                 <User class="mr-2 h-4 w-4" />
@@ -118,6 +132,7 @@
       </div>
     </main>
 
+    <!-- Borrow Confirmation Modal -->
     <Modal v-if="isBorrowModalVisible" @close="closeBorrowModal">
       <template #header>Confirm Borrow</template>
       <template #body>
@@ -140,6 +155,8 @@
   </div>
 </template>
 
+
+
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -150,9 +167,13 @@ import Modal from '@/components/Modal.vue';
 
 const route = useRoute();
 const mediaDetails = ref({});
+const borrowHistory = ref([]);
 const similarItems = ref([]);
 const isBorrowModalVisible = ref(false);
 const borrowError = ref(null); // State for error messages
+const loadingHistory = ref(true);
+const historyError = ref(null);
+
 const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
 
 const loadMediaDetails = async () => {
@@ -166,14 +187,27 @@ const loadMediaDetails = async () => {
         Genre: mediaDetails.value.genre,
       },
     });
-    
+
     similarItems.value = similarResponse.data.filter((item) => item.id !== mediaDetails.value.id);
   } catch (error) {
     console.error('Failed to load media details:', error);
   }
 };
 
-const formatDate = (date) => new Date(date).toLocaleDateString();
+const loadBorrowHistory = async () => {
+  try {
+    loadingHistory.value = true;
+    historyError.value = null;
+    const response = await axiosInstance.get(`/media/${route.params.id}/history`);
+    borrowHistory.value = response.data;
+  } catch (error) {
+    historyError.value = 'Failed to load borrow history. Please try again later.';
+    console.error('Error loading borrow history:', error);
+  } finally {
+    loadingHistory.value = false;
+  }
+};
+
 
 const reserveItem = async () => {
   console.log('Reserve functionality is under development.');
@@ -201,11 +235,11 @@ const confirmBorrow = async () => {
   }
 };
 
-onMounted(loadMediaDetails);
+const formatDate = (date) => new Date(date).toLocaleDateString();
+
+onMounted(() => {
+  loadMediaDetails();
+  loadBorrowHistory();
+});
 </script>
 
-
-
-<style scoped>
-/* Removed custom styles in favor of Tailwind utilities */
-</style>
