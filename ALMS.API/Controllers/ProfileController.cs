@@ -23,11 +23,9 @@ namespace ALMS.API.Controllers
         public async Task<ActionResult> UpdateUser([FromBody] UpdateUserDto updateUserDto, string id)
         {
             var userToUpdate = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-            if (userToUpdate is null) return NotFound();
+            if (userToUpdate is null) return NotFound("User not found.");
 
             _mapper.Map(updateUserDto, userToUpdate);
-
-  
 
             var emailService = new EmailService();
             if(userToUpdate.Email != null)
@@ -36,6 +34,7 @@ namespace ALMS.API.Controllers
               $"\nKind Regards\nCall Center Support Team\n\n**PLEASE CONTACT US ON 011425465466 IF YOU DID NOT REQUEST TO CHANGE YOUR DETAILS");
 
             }
+
             await _dbContext.SaveChangesAsync();
 
             return NoContent();
