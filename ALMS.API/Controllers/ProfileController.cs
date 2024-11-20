@@ -40,5 +40,44 @@ namespace ALMS.API.Controllers
 
             return NoContent();
         }
+
+        [Authorize(Roles = $"{UserRoles.BranchLibarian},{UserRoles.CallCenterOperator}")]
+        [HttpGet("search")]
+        public async Task<ActionResult<List<MediaDto>>> GetProfile([FromQuery] SearchUserQuery query)
+        {
+            var userQuery = _dbContext.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.FirstName))
+            {
+                userQuery = userQuery.Where(m => m.FirstName.Contains(query.FirstName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.LastName))
+            {
+                userQuery = userQuery.Where(m => m.LastName.Contains(query.LastName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Email))
+            {
+                userQuery = userQuery.Where(m => m.Email.Contains(query.Email));
+            }
+            if (!string.IsNullOrWhiteSpace(query.PhoneNumber))
+            {
+                userQuery = userQuery.Where(m => m.PhoneNumber.Contains(query.PhoneNumber));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Address))
+            {
+                userQuery = userQuery.Where(m => m.Address.Contains(query.Address));
+            }
+            if (!string.IsNullOrWhiteSpace(query.UserName))
+            {
+                userQuery = userQuery.Where(m => m.UserName.Contains(query.UserName));
+            }
+            var filteredUser = await userQuery.ToListAsync();
+
+            var user = _mapper.Map<IEnumerable<UserDto>>(filteredUser);
+
+            return Ok(user);
+        }
     }
 }
