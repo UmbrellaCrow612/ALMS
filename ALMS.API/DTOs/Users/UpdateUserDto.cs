@@ -14,6 +14,8 @@ namespace ALMS.API.DTOs.Users
 
         [Required]
         public required string Address { get; set; }
+        [Required]
+        public required string PhoneNumber { get; set; }
         /// <summary>
         /// Higher privilege will activate a user account / in the system treat this model as account 
         /// </summary>
