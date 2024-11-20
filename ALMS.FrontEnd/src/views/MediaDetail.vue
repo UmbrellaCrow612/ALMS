@@ -107,7 +107,7 @@
               Reserve
             </button>
             <button 
-              @click="borrowItem" 
+              @click="showBorrowConfirmation" 
               :disabled="!mediaDetails.isAvailable" 
               class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
@@ -117,9 +117,28 @@
         </div>
       </div>
     </main>
+
+    <Modal v-if="isBorrowModalVisible" @close="closeBorrowModal">
+      <template #header>Confirm Borrow</template>
+      <template #body>
+        <div v-if="borrowError" class="text-red-600 mb-4">{{ borrowError }}</div>
+        Are you sure you want to borrow this item?
+      </template>
+      <template #footer>
+        <button 
+          @click="confirmBorrow" 
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Confirm
+        </button>
+        <button 
+          @click="closeBorrowModal" 
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 ml-2">
+          Cancel
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
-
 
 <script setup>
 import { ref, onMounted } from 'vue';
@@ -127,10 +146,13 @@ import { useRoute } from 'vue-router';
 import axiosInstance from '@/plugins/axios';
 import { Clock, Calendar, User } from 'lucide-vue-next';
 import NavBar from '@/components/NavBar.vue';
+import Modal from '@/components/Modal.vue';
 
 const route = useRoute();
 const mediaDetails = ref({});
 const similarItems = ref([]);
+const isBorrowModalVisible = ref(false);
+const borrowError = ref(null); // State for error messages
 const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
 
 const loadMediaDetails = async () => {
@@ -154,14 +176,27 @@ const loadMediaDetails = async () => {
 const formatDate = (date) => new Date(date).toLocaleDateString();
 
 const reserveItem = async () => {
-  alert('Reserve functionality is under development.');
+  console.log('Reserve functionality is under development.');
 };
 
-const borrowItem = async () => {
+const showBorrowConfirmation = () => {
+  borrowError.value = null; // Reset error message on each confirmation
+  isBorrowModalVisible.value = true;
+};
+
+const closeBorrowModal = () => {
+  isBorrowModalVisible.value = false;
+  borrowError.value = null; // Clear error message when closing modal
+};
+
+const confirmBorrow = async () => {
   try {
-    await axiosInstance.post(`/media/${route.params.id}/borrow`);
-    alert('Item borrowed successfully!');
+    const response = await axiosInstance.post(`/media/${route.params.id}/borrow`);
+    if (response.status === 200) {
+      window.location.reload();
+    }
   } catch (error) {
+    borrowError.value = 'Failed to borrow item. Please try again.';
     console.error('Failed to borrow item:', error);
   }
 };

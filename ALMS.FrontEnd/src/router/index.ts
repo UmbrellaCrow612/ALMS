@@ -7,6 +7,8 @@ import MediaDetail from '@/views/MediaDetail.vue'
 import ApprovalView from '@/views/ApprovalView.vue'
 import InventoryView from '@/views/InventoryView.vue'
 import AboutView from '@/views/AboutView.vue'
+import SearchUsersView from '@/views/SearchUsersView.vue'
+import MyMediaView from '@/views/MyMediaView.vue'
 
 const isAuthenticated = () => {
   
@@ -62,6 +64,18 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: AboutView,
+      meta: { requiresAuth: true }, 
+    },
+    {
+      path: '/search-users',
+      name: 'searchUsers',
+      component: SearchUsersView,
+      meta: { requiresAuth: true }, 
+    },
+    {
+      path: '/my-media',
+      name: 'myMedia',
+      component: MyMediaView,
       meta: { requiresAuth: true }, 
     },
   ],

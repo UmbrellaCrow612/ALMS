@@ -44,6 +44,12 @@
                     Your Profile
                   </router-link>
                   <router-link
+                    to="/my-media"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    My media
+                  </router-link>
+                  <router-link
                     to="/subscriptions"
                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
@@ -124,13 +130,13 @@
   const isAuthenticated = computed(() => !!userStore.user);
   
   const roleBasedLinks = [
-    { name: 'Home', href: '/', roles: ['LibaryMember', 'BranchLibarian'] },
-    { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian'] },
-    { name: 'Contact', href: '/contact', roles: ['LibaryMember', 'BranchLibarian'] },
-    { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian'] },
+    { name: 'Home', href: '/', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
+    { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },,
+    { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
     { name: 'Inventory', href: '/inventory', roles: ['BranchLibarian'] },
-    { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian'] },
+    { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
     { name: 'Approval', href: '/approval', roles: ['BranchLibarian'] },
+    { name: 'Search Users', href: '/search-users', roles: ['CallCenterOperator'] },
   ];
   
   const visibleLinks = computed(() => {

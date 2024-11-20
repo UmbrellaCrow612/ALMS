@@ -64,6 +64,17 @@
           </div>
 
           <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700">
+              Phone Number
+            </label>
+            <div class="mt-1">
+              <input id="phone" name="phone" type="tel" required v-model="form.phoneNumber"
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
             <label for="email" class="block text-sm font-medium text-gray-700">
               Email address
             </label>
@@ -120,15 +131,17 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import axiosInstance from '@/plugins/axios'; // Ensure this is the correct path
+import axiosInstance from '@/plugins/axios';
 
 const router = useRouter();
 
 const form = ref({
+  userName: '',
   firstName: '',
   lastName: '',
   address: '',
   email: '',
+  phone: '',
   password: ''
 });
 
@@ -141,27 +154,23 @@ const handleSubmit = async () => {
 
   try {
     const payload = {
-      userName: form.value.email, 
+      userName: form.value.userName,
       email: form.value.email,
       password: form.value.password,
       firstName: form.value.firstName,
       lastName: form.value.lastName,
       address: form.value.address,
+      phone: form.value.phoneNumber
     };
-
-    console.log("Payload:", payload); 
 
     const response = await axiosInstance.post('/auth/register', payload);
 
     if (response.status === 200) {
       successMessage.value = 'You successfully created an account. Please wait for a branch librarian to approve it.';
     } else {
-  
       errorMessage.value = `Registration failed. Server responded with status: ${response.status}`;
     }
   } catch (error) {
-    console.error("Error response:", error.response?.data);
-
     if (error.response?.status) {
       errorMessage.value = `Registration failed. Server responded with status: ${error.response.status}`;
     } else {

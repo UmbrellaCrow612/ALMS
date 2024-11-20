@@ -12,7 +12,8 @@ import { createPinia } from 'pinia';
 import axios from 'axios';
 import InventoryView from './views/InventoryView.vue'
 import AboutView from './views/AboutView.vue'
-
+import SearchUsersView from './views/SearchUsersView.vue'
+import MyMediaView from './views/MyMediaView.vue'
 
 
 const app = createApp(App)
@@ -27,6 +28,8 @@ app.component('SearchView', SearchView)
 app.component('ApprovalView', ApprovalView)
 app.component('InventoryView', InventoryView)
 app.component('AboutView', AboutView)
+app.component('SearchUsersView', SearchUsersView)
+app.component('MyMediaView', MyMediaView)
 
 app.config.globalProperties.$axios = axios;
 
