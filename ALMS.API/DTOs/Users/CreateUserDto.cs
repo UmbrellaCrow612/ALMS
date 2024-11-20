@@ -22,5 +22,9 @@ namespace ALMS.API.DTOs.Users
 
         [Required]
         public required string Address { get; set; }
+
+        [Required]
+        [Phone]
+        public virtual string PhoneNumber { get; set; }
     }
 }
