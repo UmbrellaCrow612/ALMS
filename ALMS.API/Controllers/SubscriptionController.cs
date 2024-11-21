@@ -5,6 +5,7 @@ using ALMS.API.DTOs.Media;
 using ALMS.API.DTOs.Subscription;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stripe.Checkout;
@@ -16,10 +17,11 @@ namespace ALMS.API.Controllers
 {
     [ApiController]
     [Route("subscription")]
-    public class SubscriptionController(ApplicationDbContext dbContext, IMapper mapper) : ControllerBase
+    public class SubscriptionController(ApplicationDbContext dbContext,UserManager<ApplicationUser> userManager, IMapper mapper) : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
         private readonly IMapper _mapper = mapper;
+        private readonly UserManager<ApplicationUser> _userManager = userManager; 
 
         [Authorize]
         [HttpPost("subscribe/{stripeProductId}")]
@@ -189,34 +191,16 @@ namespace ALMS.API.Controllers
             return NoContent();
         }
 
-        [HttpGet("search")]
-        public async Task<ActionResult> SearchSubscriptions([FromQuery] SearchSubscriptionsQuery query)
+        [Authorize]
+        [HttpGet("/users/{userId}")]
+        public async Task<ActionResult> GetSubForUserId(string userId)
         {
-            var userQuery = _dbContext.Users.AsQueryable();
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return NotFound("User not found.");
 
-            if (!string.IsNullOrWhiteSpace(query.FirstName))
-            {
-                _ = userQuery.Where(x => x.FirstName.Contains(query.FirstName));
-            }
+            var subscriptions = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
 
-            if (!string.IsNullOrWhiteSpace(query.LastName))
-            {
-                _ = userQuery.Where(x => x.LastName.Contains(query.LastName));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.PhoneNumber))
-            {
-                _ = userQuery.Where(x => x.PhoneNumber!.Contains(query.PhoneNumber));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Address))
-            {
-                _ = userQuery.Where(x => x.Address.Contains(query.Address));
-            }
-
-            var filteredSubscriptions = await userQuery.Include(x => x.Subscriptions).ToListAsync();
-
-            var dto = _mapper.Map<IEnumerable<SubscriptionDto>>(filteredSubscriptions);
+            var dto = _mapper.Map<IEnumerable<SubscriptionDto>>(subscriptions);
 
             return Ok(dto);
         }
