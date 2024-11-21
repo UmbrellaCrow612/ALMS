@@ -12,6 +12,7 @@ namespace ALMS.API.Mappings
             CreateMap<UpdateSubscriptionDto, Subscription>();
             CreateMap<CreateStripeProductDto, StripeProductEntity>();
             CreateMap<UpdateStripeProductDto, StripeProductEntity>();
+            CreateMap<Subscription, SubscriptionDto>();
         }
     }
 }

@@ -23,6 +23,7 @@ namespace ALMS.API.Data.Models
         /// </summary>
         public ICollection<BorrowTransaction> BorrowedItems { get; set; } = [];
         public ICollection<ForgotPasswordAttempt> ForgotPasswordAttempts { get; set; } = [];
+        public ICollection<Subscription> Subscriptions { get; set; } = [];
     }
 
     public enum MembershipStatus

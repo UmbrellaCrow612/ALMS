@@ -6,10 +6,7 @@ using ALMS.API.DTOs.Subscription;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using Stripe;
 using Stripe.Checkout;
 using System.Globalization;
 using System.Security.Claims;
@@ -25,7 +22,7 @@ namespace ALMS.API.Controllers
         private readonly IMapper _mapper = mapper;
 
         [Authorize]
-        [HttpPost("subscribe{stripeProductId}")]
+        [HttpPost("subscribe/{stripeProductId}")]
         public async Task<ActionResult> Subscribe(string stripeProductId)
         {
 
@@ -135,11 +132,11 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("update{stripeProductId}")]
-        public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto, string id)
+        [HttpPatch("update/{stripeProductId}")]
+        public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto, string stripeProductId)
         {
 
-            var subscriptonToUpdate = await _dbContext.Subscriptions.FirstOrDefaultAsync(x => x.Id == id);
+            var subscriptonToUpdate = await _dbContext.Subscriptions.FirstOrDefaultAsync(x => x.Id == stripeProductId);
 
             if (subscriptonToUpdate is null) return NotFound();
 
@@ -165,10 +162,10 @@ namespace ALMS.API.Controllers
 
         [Authorize(Roles = UserRoles.Accountant)]
         [HttpPatch("stripeSubscription/update/{stripeProductId}")]
-        public async Task<ActionResult> UpdateStripeProduct([FromBody] UpdateStripeProductDto updateStripeProductDto, string id)
+        public async Task<ActionResult> UpdateStripeProduct([FromBody] UpdateStripeProductDto updateStripeProductDto, string stripeProductId)
         {
 
-            var StripeProductToUpdate = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == id);
+            var StripeProductToUpdate = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == stripeProductId);
 
             if (StripeProductToUpdate is null) return NotFound();
 
@@ -181,15 +178,47 @@ namespace ALMS.API.Controllers
 
         [Authorize(Roles = UserRoles.Accountant)]
         [HttpDelete("stripeSubscription/delete/{stripeProductId}")]
-        public async Task<ActionResult> DeleteStripeSubscriptionItem(string id)
+        public async Task<ActionResult> DeleteStripeSubscriptionItem(string stripeProductId)
         {
-            var stripeSubscriptionToDelete = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == id);
+            var stripeSubscriptionToDelete = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == stripeProductId);
             if (stripeSubscriptionToDelete is null) return NotFound();
 
             _dbContext.StripeProducts.Remove(stripeSubscriptionToDelete);
             await _dbContext.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult> SearchSubscriptions([FromQuery] SearchSubscriptionsQuery query)
+        {
+            var userQuery = _dbContext.Users.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.FirstName))
+            {
+                _ = userQuery.Where(x => x.FirstName.Contains(query.FirstName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.LastName))
+            {
+                _ = userQuery.Where(x => x.LastName.Contains(query.LastName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.PhoneNumber))
+            {
+                _ = userQuery.Where(x => x.PhoneNumber!.Contains(query.PhoneNumber));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Address))
+            {
+                _ = userQuery.Where(x => x.Address.Contains(query.Address));
+            }
+
+            var filteredSubscriptions = await userQuery.Include(x => x.Subscriptions).ToListAsync();
+
+            var dto = _mapper.Map<IEnumerable<SubscriptionDto>>(filteredSubscriptions);
+
+            return Ok(dto);
         }
     }
 }
