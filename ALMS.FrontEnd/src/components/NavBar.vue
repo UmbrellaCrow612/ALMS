@@ -137,6 +137,7 @@
     { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
     { name: 'Approval', href: '/approval', roles: ['BranchLibarian'] },
     { name: 'Search Users', href: '/search-users', roles: ['CallCenterOperator'] },
+    { name: 'Reservations', href: '/reservations', roles: ['BranchLibarian'] },
   ];
   
   const visibleLinks = computed(() => {

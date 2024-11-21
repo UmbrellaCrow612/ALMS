@@ -9,6 +9,7 @@ import InventoryView from '@/views/InventoryView.vue'
 import AboutView from '@/views/AboutView.vue'
 import SearchUsersView from '@/views/SearchUsersView.vue'
 import MyMediaView from '@/views/MyMediaView.vue'
+import ReservationView from '@/views/ReservationView.vue'
 
 const isAuthenticated = () => {
   
@@ -77,6 +78,14 @@ const router = createRouter({
       name: 'myMedia',
       component: MyMediaView,
       meta: { requiresAuth: true }, 
+    },
+    {
+      path: '/reservations',
+      name: 'reservations',
+      component: ReservationView,
+      meta: { 
+        requiresAuth: true,
+      },
     },
   ],
 })

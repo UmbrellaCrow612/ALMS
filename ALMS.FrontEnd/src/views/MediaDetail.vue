@@ -152,6 +152,27 @@
         </button>
       </template>
     </Modal>
+
+    <!-- Reservation Confirmation Modal -->
+    <Modal v-if="isReserveModalVisible" @close="closeReserveModal">
+      <template #header>Confirm Reservation</template>
+      <template #body>
+        <div v-if="reserveError" class="text-red-600 mb-4">{{ reserveError }}</div>
+        Are you sure you want to reserve this item?
+      </template>
+      <template #footer>
+        <button 
+          @click="confirmReserve" 
+          class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+          Confirm
+        </button>
+        <button 
+          @click="closeReserveModal" 
+          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 ml-2">
+          Cancel
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -173,6 +194,8 @@ const isBorrowModalVisible = ref(false);
 const borrowError = ref(null); // State for error messages
 const loadingHistory = ref(true);
 const historyError = ref(null);
+const isReserveModalVisible = ref(false);
+const reserveError = ref(null); // State for error messages
 
 const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
 
@@ -209,8 +232,9 @@ const loadBorrowHistory = async () => {
 };
 
 
-const reserveItem = async () => {
-  console.log('Reserve functionality is under development.');
+const reserveItem = () => {
+  reserveError.value = null;
+  isReserveModalVisible.value = true;
 };
 
 const showBorrowConfirmation = () => {
@@ -236,6 +260,23 @@ const confirmBorrow = async () => {
 };
 
 const formatDate = (date) => new Date(date).toLocaleDateString();
+
+const closeReserveModal = () => {
+  isReserveModalVisible.value = false;
+  reserveError.value = null;
+};
+
+const confirmReserve = async () => {
+  try {
+    // Will be replaced with actual API call
+    console.log('Reserving item:', route.params.id);
+    closeReserveModal();
+    // Optionally refresh the page or show success message
+  } catch (error) {
+    reserveError.value = 'Failed to reserve item. Please try again.';
+    console.error('Failed to reserve item:', error);
+  }
+};
 
 onMounted(() => {
   loadMediaDetails();
