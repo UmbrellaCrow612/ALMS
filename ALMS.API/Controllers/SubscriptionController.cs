@@ -192,7 +192,7 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize]
-        [HttpGet("/users/{userId}")]
+        [HttpGet("users/{userId}")]
         public async Task<ActionResult> GetSubForUserId(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
