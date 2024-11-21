@@ -25,8 +25,8 @@ namespace ALMS.API.Controllers
         private readonly IMapper _mapper = mapper;
 
         [Authorize]
-        [HttpPost("subscribe{id}")]
-        public async Task<ActionResult> Subscribe(string id)
+        [HttpPost("subscribe{stripeProductId}")]
+        public async Task<ActionResult> Subscribe(string stripeProductId)
         {
 
             var lineItems = new List<SessionLineItemOptions>();
@@ -46,7 +46,7 @@ namespace ALMS.API.Controllers
             // Loop through products to add them to the session
             foreach (var product in products)
             {
-                if (product.Id == id)
+                if (product.Id == stripeProductId)
                 {
                     decimal price = decimal.TryParse(product.Rate.Replace("£", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result) ? result : 0m;
                     var sessionListItem = new SessionLineItemOptions
@@ -63,6 +63,10 @@ namespace ALMS.API.Controllers
                         Quantity = product.Quanity
                     };
                     options.LineItems.Add(sessionListItem);
+                }
+                else
+                {
+                    return NotFound("Stripe Product Not Found");
                 }
             }
 
@@ -131,7 +135,7 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("update{id}")]
+        [HttpPatch("update{stripeProductId}")]
         public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto, string id)
         {
 
@@ -160,7 +164,7 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("stripeSubscription/update/{id}")]
+        [HttpPatch("stripeSubscription/update/{stripeProductId}")]
         public async Task<ActionResult> UpdateStripeProduct([FromBody] UpdateStripeProductDto updateStripeProductDto, string id)
         {
 
@@ -176,7 +180,7 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpDelete("stripeSubscription/delete/{id}")]
+        [HttpDelete("stripeSubscription/delete/{stripeProductId}")]
         public async Task<ActionResult> DeleteStripeSubscriptionItem(string id)
         {
             var stripeSubscriptionToDelete = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == id);
