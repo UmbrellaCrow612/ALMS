@@ -67,7 +67,48 @@
         </template>
         <template #body>
           <form @submit.prevent="handleSubmit" class="space-y-4">
-            <!-- Form Fields Here -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Title</label>
+              <input type="text" v-model="formData.title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea v-model="formData.description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Published At</label>
+              <input type="date" v-model="formData.publishedAt" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">ISBN</label>
+              <input type="text" v-model="formData.isbn" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Image URL</label>
+              <input type="url" v-model="formData.imgUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Author</label>
+              <input type="text" v-model="formData.author" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Genre</label>
+              <input type="text" v-model="formData.genre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Media Type</label>
+              <select v-model="formData.mediaType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option v-for="(type, index) in mediaTypes" :key="index" :value="index">{{ type }}</option>
+              </select>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+              <button type="button" @click="closeModal" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                {{ editingMedia ? 'Update' : 'Create' }}
+              </button>
+            </div>
           </form>
         </template>
       </Modal>
@@ -137,6 +178,50 @@ const loadInventory = async () => {
     inventory.value = response.data;
   } catch (error) {
     console.error('Failed to load inventory:', error);
+  }
+};
+
+const openAddModal = () => {
+  editingMedia.value = null;
+  formData.value = {
+    title: '',
+    description: '',
+    publishedAt: '',
+    isbn: '',
+    imgUrl: '',
+    author: '',
+    genre: '',
+    mediaType: 0,
+  };
+  isModalOpen.value = true;
+};
+
+const openEditModal = (item) => {
+  editingMedia.value = item;
+  formData.value = { ...item };
+  isModalOpen.value = true;
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+  editingMedia.value = null;
+};
+
+const handleSubmit = async () => {
+  try {
+    if (editingMedia.value) {
+      await axiosInstance.patch(`/media/${editingMedia.value.id}`, formData.value);
+      const index = inventory.value.findIndex(item => item.id === editingMedia.value.id);
+      if (index !== -1) {
+        inventory.value[index] = { ...editingMedia.value, ...formData.value };
+      }
+    } else {
+      const response = await axiosInstance.post('/media', formData.value);
+      await loadInventory(); // Reload inventory after adding new media
+    }
+    closeModal();
+  } catch (error) {
+    console.error('Failed to save media:', error);
   }
 };
 
