@@ -75,11 +75,6 @@ namespace ALMS.API.Controllers
             var reservation = await _dbcontext.Reservations.FirstOrDefaultAsync(x => x.Id == reservationId);
             if (reservation is null) return NotFound("Reservation not found.");
 
-            if (reservation.IsApproved is false)
-            {
-                return BadRequest("Reservation already denied.");
-            }
-
             reservation.IsApproved = false;
 
             _dbcontext.Reservations.Update(reservation);
