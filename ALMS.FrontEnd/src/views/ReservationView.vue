@@ -23,7 +23,10 @@
                 Requested by: {{ reservation.user.username }}
               </p>
               <p class="text-sm text-slate-500 mt-1">
-                Requested on: {{ formatDate(reservation.requestDate) }}
+                Reserved on: {{ formatDate(reservation.reservedOn) }}
+              </p>
+              <p class="text-sm text-slate-500 mt-1">
+                Reserved to: {{ formatDate(reservation.reservedTo) }}
               </p>
 
               <!-- Action Buttons -->
@@ -68,7 +71,8 @@ const reservations = ref([
       id: 1,
       username: "john_doe"
     },
-    requestDate: new Date()
+    reservedOn: new Date(),
+    reservedTo: new Date(new Date().setDate(new Date().getDate() + 14))
   },
   {
     id: 2,
@@ -81,7 +85,8 @@ const reservations = ref([
       id: 2,
       username: "jane_smith"
     },
-    requestDate: new Date()
+    reservedOn: new Date(),
+    reservedTo: new Date(new Date().setDate(new Date().getDate() + 14))
   }
 ]);
 

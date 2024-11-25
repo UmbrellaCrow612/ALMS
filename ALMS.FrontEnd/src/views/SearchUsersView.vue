@@ -68,10 +68,18 @@
                 <td class="px-6 py-4">{{ user.address }}</td>
                 <td class="px-6 py-4 flex space-x-2">
                   <button
+                    v-if="!isAccountant"
                     @click="editUser(user)"
                     class="text-blue-500 hover:text-blue-700"
                   >
                     Edit
+                  </button>
+                  <button 
+                    v-else
+                    @click="manageSubscriptions(user)"
+                    class="text-red-500 hover:text-red-700"
+                  >
+                    Manage 
                   </button>
                 </td>
               </tr>
@@ -146,8 +154,12 @@
   <script setup>
   import NavBar from '@/components/NavBar.vue';
   import Modal from '@/components/Modal.vue';
-  import { ref, onMounted } from 'vue';
+  import { ref, onMounted, computed } from 'vue';
   import axiosInstance from '@/plugins/axios';
+  import { useUserStore } from '@/stores/userStore';
+  
+  const userStore = useUserStore();
+  const isAccountant = computed(() => userStore.user?.roles.includes('Accountant'));
   
   const searchFilters = ref({
     firstName: '',
@@ -176,6 +188,11 @@
   const editUser = (user) => {
     currentUser.value = { ...user };
     isModalOpen.value = true;
+  };
+  
+  const manageSubscriptions = (user) => {
+    // TODO: Implement subscription management logic
+    console.log('Managing subscriptions for user:', user);
   };
   
   const closeModal = () => {
@@ -212,4 +229,3 @@
     max-width: 1200px;
   }
   </style>
-  

@@ -130,13 +130,13 @@
   const isAuthenticated = computed(() => !!userStore.user);
   
   const roleBasedLinks = [
-    { name: 'Home', href: '/', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
-    { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },,
-    { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
+    { name: 'Home', href: '/', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator', 'Accountant'] },
+    { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator', 'Accountant'] },,
+    { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator', 'Accountant'] },
     { name: 'Inventory', href: '/inventory', roles: ['BranchLibarian'] },
     { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
     { name: 'Approval', href: '/approval', roles: ['BranchLibarian'] },
-    { name: 'Search Users', href: '/search-users', roles: ['CallCenterOperator'] },
+    { name: 'Search Users', href: '/search-users', roles: ['CallCenterOperator', 'Accountant'] },
     { name: 'Reservations', href: '/reservations', roles: ['BranchLibarian'] },
   ];
   

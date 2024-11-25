@@ -155,15 +155,35 @@
 
     <!-- Reservation Confirmation Modal -->
     <Modal v-if="isReserveModalVisible" @close="closeReserveModal">
-      <template #header>Confirm Reservation</template>
+      <template #header>Reserve Item</template>
       <template #body>
         <div v-if="reserveError" class="text-red-600 mb-4">{{ reserveError }}</div>
-        Are you sure you want to reserve this item?
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Reserve From</label>
+            <input 
+              type="date" 
+              v-model="reserveFromDate"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+              :min="today"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Reserve Until</label>
+            <input 
+              type="date" 
+              v-model="reserveToDate"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
+              :min="reserveFromDate"
+            />
+          </div>
+        </div>
       </template>
       <template #footer>
         <button 
           @click="confirmReserve" 
-          class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+          :disabled="!isValidReservation"
+          class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed">
           Confirm
         </button>
         <button 
@@ -179,7 +199,7 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import axiosInstance from '@/plugins/axios';
 import { Clock, Calendar, User } from 'lucide-vue-next';
@@ -191,13 +211,24 @@ const mediaDetails = ref({});
 const borrowHistory = ref([]);
 const similarItems = ref([]);
 const isBorrowModalVisible = ref(false);
-const borrowError = ref(null); // State for error messages
+const borrowError = ref(null);
 const loadingHistory = ref(true);
 const historyError = ref(null);
 const isReserveModalVisible = ref(false);
-const reserveError = ref(null); // State for error messages
+const reserveError = ref(null);
+const reserveFromDate = ref('');
+const reserveToDate = ref('');
 
 const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
+
+const today = computed(() => {
+  const date = new Date();
+  return date.toISOString().split('T')[0];
+});
+
+const isValidReservation = computed(() => {
+  return reserveFromDate.value && reserveToDate.value && reserveFromDate.value <= reserveToDate.value;
+});
 
 const loadMediaDetails = async () => {
   try {
@@ -231,20 +262,21 @@ const loadBorrowHistory = async () => {
   }
 };
 
-
 const reserveItem = () => {
   reserveError.value = null;
+  reserveFromDate.value = today.value;
+  reserveToDate.value = '';
   isReserveModalVisible.value = true;
 };
 
 const showBorrowConfirmation = () => {
-  borrowError.value = null; // Reset error message on each confirmation
+  borrowError.value = null;
   isBorrowModalVisible.value = true;
 };
 
 const closeBorrowModal = () => {
   isBorrowModalVisible.value = false;
-  borrowError.value = null; // Clear error message when closing modal
+  borrowError.value = null;
 };
 
 const confirmBorrow = async () => {
@@ -264,12 +296,20 @@ const formatDate = (date) => new Date(date).toLocaleDateString();
 const closeReserveModal = () => {
   isReserveModalVisible.value = false;
   reserveError.value = null;
+  reserveFromDate.value = '';
+  reserveToDate.value = '';
 };
 
 const confirmReserve = async () => {
   try {
-    // Will be replaced with actual API call
-    console.log('Reserving item:', route.params.id);
+    const reservationData = {
+      mediaId: route.params.id,
+      fromDate: reserveFromDate.value,
+      toDate: reserveToDate.value
+    };
+    
+    // Replace with actual API call
+    console.log('Reserving item:', reservationData);
     closeReserveModal();
     // Optionally refresh the page or show success message
   } catch (error) {
@@ -283,4 +323,3 @@ onMounted(() => {
   loadBorrowHistory();
 });
 </script>
-
