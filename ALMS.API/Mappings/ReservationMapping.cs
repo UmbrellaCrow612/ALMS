@@ -9,6 +9,7 @@ namespace ALMS.API.Mappings
         public ReservationMapping()
         {
             CreateMap<CreateReservationDto, Reservation>();
+            CreateMap<Reservation, ReservationDto>();
         }
     }
 }

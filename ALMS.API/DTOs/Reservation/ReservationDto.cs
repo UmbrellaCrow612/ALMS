@@ -1,4 +1,5 @@
 ﻿using ALMS.API.Data.Models;
+using ALMS.API.DTOs.Users;
 
 namespace ALMS.API.DTOs.Reservation
 {
@@ -7,6 +8,8 @@ namespace ALMS.API.DTOs.Reservation
         public required string Id { get; set; }
 
         public required string UserId { get; set; }
+
+        public required UserDto User { get; set; }
 
         public required string MediaId { get; set; }
 
