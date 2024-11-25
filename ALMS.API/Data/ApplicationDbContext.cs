@@ -16,6 +16,7 @@ namespace ALMS.API.Data
         public DbSet<StripeSession> StripeSessions { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<ForgotPasswordAttempt> ForgotPasswordAttempts { get; set; }
+        public DbSet<YSubscription> YSubscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

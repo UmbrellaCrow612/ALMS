@@ -260,6 +260,29 @@ namespace ALMS.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "YSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "TEXT", nullable: false),
+                    Amount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    SubscriptionType = table.Column<string>(type: "TEXT", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_YSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_YSubscriptions_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "BorrowTransactions",
                 columns: table => new
                 {
@@ -424,6 +447,11 @@ namespace ALMS.API.Migrations
                 name: "IX_Subscriptions_UserId",
                 table: "Subscriptions",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_YSubscriptions_UserId",
+                table: "YSubscriptions",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -464,6 +492,9 @@ namespace ALMS.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Subscriptions");
+
+            migrationBuilder.DropTable(
+                name: "YSubscriptions");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

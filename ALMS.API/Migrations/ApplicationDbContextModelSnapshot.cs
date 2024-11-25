@@ -338,6 +338,38 @@ namespace ALMS.API.Migrations
                     b.ToTable("Subscriptions");
                 });
 
+            modelBuilder.Entity("ALMS.API.Data.Models.YSubscription", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SubscriptionType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("YSubscriptions");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -556,6 +588,17 @@ namespace ALMS.API.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ALMS.API.Data.Models.YSubscription", b =>
+                {
+                    b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
+                        .WithMany("YSubscriptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -614,6 +657,8 @@ namespace ALMS.API.Migrations
                     b.Navigation("ForgotPasswordAttempts");
 
                     b.Navigation("Subscriptions");
+
+                    b.Navigation("YSubscriptions");
                 });
 
             modelBuilder.Entity("ALMS.API.Data.Models.Media", b =>

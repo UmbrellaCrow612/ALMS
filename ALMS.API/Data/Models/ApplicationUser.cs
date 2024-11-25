@@ -24,6 +24,9 @@ namespace ALMS.API.Data.Models
         public ICollection<BorrowTransaction> BorrowedItems { get; set; } = [];
         public ICollection<ForgotPasswordAttempt> ForgotPasswordAttempts { get; set; } = [];
         public ICollection<Subscription> Subscriptions { get; set; } = [];
+
+
+        public ICollection<YSubscription> YSubscriptions { get; set; } = [];
     }
 
     public enum MembershipStatus
