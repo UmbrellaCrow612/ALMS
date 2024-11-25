@@ -322,8 +322,9 @@ namespace ALMS.API.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     MediaId = table.Column<string>(type: "TEXT", nullable: false),
-                    ReservedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsFulfilled = table.Column<bool>(type: "INTEGER", nullable: false)
+                    ReserveFrom = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ReserveTo = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsApproved = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -13,7 +13,10 @@
         public required string MediaId { get; set; }
         public Media? Media { get; set; } = null;
 
-        public DateTime ReservedAt { get; set; }
-        public bool IsFulfilled { get; set; }
+        public DateTime ReserveFrom { get; set; }
+
+        public required DateTime ReserveTo { get; set; }
+
+        public bool IsApproved { get; set; }
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241118164302_Init")]
+    [Migration("20241125140056_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -244,14 +244,17 @@ namespace ALMS.API.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsFulfilled")
+                    b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("MediaId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ReservedAt")
+                    b.Property<DateTime>("ReserveFrom")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ReserveTo")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
@@ -548,7 +551,7 @@ namespace ALMS.API.Migrations
             modelBuilder.Entity("ALMS.API.Data.Models.Subscription", b =>
                 {
                     b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -612,6 +615,8 @@ namespace ALMS.API.Migrations
                     b.Navigation("BorrowedItems");
 
                     b.Navigation("ForgotPasswordAttempts");
+
+                    b.Navigation("Subscriptions");
                 });
 
             modelBuilder.Entity("ALMS.API.Data.Models.Media", b =>
