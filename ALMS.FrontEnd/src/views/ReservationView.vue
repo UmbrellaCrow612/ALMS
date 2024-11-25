@@ -20,13 +20,13 @@
             <div class="flex-1">
               <h3 class="font-semibold text-slate-900">{{ reservation.media.title }}</h3>
               <p class="text-sm text-slate-600 mt-1">
-                Requested by: {{ reservation.user.username }}
+                Requested by: {{ reservation.user.userName }}
               </p>
               <p class="text-sm text-slate-500 mt-1">
-                Reserved on: {{ formatDate(reservation.reservedOn) }}
+                Reserved on: {{ formatDate(reservation.reserveFrom) }}
               </p>
               <p class="text-sm text-slate-500 mt-1">
-                Reserved to: {{ formatDate(reservation.reservedTo) }}
+                Reserved to: {{ formatDate(reservation.reserveTo) }}
               </p>
 
               <!-- Action Buttons -->
@@ -57,38 +57,9 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import NavBar from '@/components/NavBar.vue';
+import axiosInstance from '@/plugins/axios';
 
-// Dummy data for now
-const reservations = ref([
-  {
-    id: 1,
-    media: {
-      id: 1,
-      title: "The Great Gatsby",
-      imgUrl: "https://example.com/gatsby.jpg"
-    },
-    user: {
-      id: 1,
-      username: "john_doe"
-    },
-    reservedOn: new Date(),
-    reservedTo: new Date(new Date().setDate(new Date().getDate() + 14))
-  },
-  {
-    id: 2,
-    media: {
-      id: 2,
-      title: "1984",
-      imgUrl: "https://example.com/1984.jpg"
-    },
-    user: {
-      id: 2,
-      username: "jane_smith"
-    },
-    reservedOn: new Date(),
-    reservedTo: new Date(new Date().setDate(new Date().getDate() + 14))
-  }
-]);
+const reservations = ref([]);
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString();
@@ -96,8 +67,7 @@ const formatDate = (date) => {
 
 const handleAccept = async (reservationId) => {
   try {
-    // Will be replaced with actual API call
-    console.log('Accepting reservation:', reservationId);
+    await axiosInstance.post(`/reservations/${reservationId}/approve`);
     reservations.value = reservations.value.filter(r => r.id !== reservationId);
   } catch (error) {
     console.error('Error accepting reservation:', error);
@@ -106,15 +76,23 @@ const handleAccept = async (reservationId) => {
 
 const handleDeny = async (reservationId) => {
   try {
-    // Will be replaced with actual API call
-    console.log('Denying reservation:', reservationId);
+    await axiosInstance.post(`/reservations/${reservationId}/deny`);
     reservations.value = reservations.value.filter(r => r.id !== reservationId);
   } catch (error) {
     console.error('Error denying reservation:', error);
   }
 };
 
+const fetchReservations = async () => {
+  try {
+    const response = await axiosInstance.get('/reservations');
+    reservations.value = response.data;
+  } catch (error) {
+    console.error('Error fetching reservations:', error);
+  }
+};
+
 onMounted(() => {
-  // Will fetch actual reservations when API is ready
+  fetchReservations();
 });
 </script> 

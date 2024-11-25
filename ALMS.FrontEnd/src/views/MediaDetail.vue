@@ -303,15 +303,16 @@ const closeReserveModal = () => {
 const confirmReserve = async () => {
   try {
     const reservationData = {
-      mediaId: route.params.id,
-      fromDate: reserveFromDate.value,
-      toDate: reserveToDate.value
+      reserveFrom: new Date(reserveFromDate.value).toISOString(),
+      reserveTo: new Date(reserveToDate.value).toISOString()
     };
     
-    // Replace with actual API call
-    console.log('Reserving item:', reservationData);
-    closeReserveModal();
-    // Optionally refresh the page or show success message
+    const response = await axiosInstance.post(`/reservations/medias/${route.params.id}/reserve`, reservationData);
+    
+    if (response.status === 204) {
+      closeReserveModal();
+      window.location.reload();
+    }
   } catch (error) {
     reserveError.value = 'Failed to reserve item. Please try again.';
     console.error('Failed to reserve item:', error);
