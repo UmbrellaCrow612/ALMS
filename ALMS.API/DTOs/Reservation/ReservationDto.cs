@@ -17,6 +17,6 @@ namespace ALMS.API.DTOs.Reservation
 
         public required DateTime ReserveTo { get; set; }
 
-        public bool IsApproved { get; set; }
+        public bool IsApproved { get; set; } = false;
     }
 }
