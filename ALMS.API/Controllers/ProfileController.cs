@@ -40,7 +40,7 @@ namespace ALMS.API.Controllers
             return NoContent();
         }
 
-        [Authorize(Roles = $"{UserRoles.BranchLibarian},{UserRoles.CallCenterOperator}")]
+        [Authorize(Roles = $"{UserRoles.BranchLibarian},{UserRoles.CallCenterOperator},{UserRoles.Accountant}")]
         [HttpGet("search")]
         public async Task<ActionResult<List<MediaDto>>> GetProfile([FromQuery] SearchUserQuery query)
         {
