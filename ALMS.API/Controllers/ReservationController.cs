@@ -17,6 +17,17 @@ namespace ALMS.API.Controllers
         private readonly IMapper _mapper = mapper;
 
         [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> GetReservations()
+        {
+            var resevations = await _dbcontext.Reservations.Where(x => x.IsApproved == false).ToListAsync();
+
+            var dto = _mapper.Map<ICollection<ReservationDto>>(resevations);
+
+            return Ok(dto);
+        }
+
+        [Authorize]
         [HttpPost("medias/{mediaId}/reserve")]
         public async Task<ActionResult> ReserverMediaById(string mediaId, [FromBody] CreateReservationDto createReservationDto) 
         {
