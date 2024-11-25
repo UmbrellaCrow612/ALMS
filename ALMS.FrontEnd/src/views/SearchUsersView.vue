@@ -76,8 +76,8 @@
                   </button>
                   <button 
                     v-else
-                    @click="manageSubscriptions(user)"
-                    class="text-red-500 hover:text-red-700"
+                    @click="router.push(`/users/${user.id}`)"
+                    class="text-red-500 hover:text--700"
                   >
                     Manage 
                   </button>
@@ -157,7 +157,9 @@
   import { ref, onMounted, computed } from 'vue';
   import axiosInstance from '@/plugins/axios';
   import { useUserStore } from '@/stores/userStore';
+  import { useRouter } from 'vue-router';
   
+  const router = useRouter();
   const userStore = useUserStore();
   const isAccountant = computed(() => userStore.user?.roles.includes('Accountant'));
   
@@ -188,11 +190,6 @@
   const editUser = (user) => {
     currentUser.value = { ...user };
     isModalOpen.value = true;
-  };
-  
-  const manageSubscriptions = (user) => {
-    // TODO: Implement subscription management logic
-    console.log('Managing subscriptions for user:', user);
   };
   
   const closeModal = () => {

@@ -10,6 +10,7 @@ import AboutView from '@/views/AboutView.vue'
 import SearchUsersView from '@/views/SearchUsersView.vue'
 import MyMediaView from '@/views/MyMediaView.vue'
 import ReservationView from '@/views/ReservationView.vue'
+import UserDetailsView from '@/views/UserDetailsView.vue'
 
 const isAuthenticated = () => {
   
@@ -86,6 +87,13 @@ const router = createRouter({
       meta: { 
         requiresAuth: true,
       },
+    },
+    {
+      path: '/users/:id',
+      name: 'userDetails',
+      component: UserDetailsView,
+      props: true,
+      meta: { requiresAuth: true },
     },
   ],
 })
