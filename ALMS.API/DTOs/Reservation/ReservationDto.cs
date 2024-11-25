@@ -1,4 +1,5 @@
 ﻿using ALMS.API.Data.Models;
+using ALMS.API.DTOs.Media;
 using ALMS.API.DTOs.Users;
 
 namespace ALMS.API.DTOs.Reservation
@@ -12,6 +13,8 @@ namespace ALMS.API.DTOs.Reservation
         public required UserDto User { get; set; }
 
         public required string MediaId { get; set; }
+
+        public required MediaDto Media { get; set; }
 
         public DateTime ReserveFrom { get; set; }
 

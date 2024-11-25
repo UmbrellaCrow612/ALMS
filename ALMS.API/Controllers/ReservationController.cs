@@ -20,7 +20,7 @@ namespace ALMS.API.Controllers
         [HttpGet]
         public async Task<ActionResult> GetReservations()
         {
-            var resevations = await _dbcontext.Reservations.Where(x => x.IsApproved == false).Include(x => x.User).ToListAsync();
+            var resevations = await _dbcontext.Reservations.Where(x => x.IsApproved == false).Include(x => x.User).Include(x => x.Media).ToListAsync();
 
             var dto = _mapper.Map<ICollection<ReservationDto>>(resevations);
 
