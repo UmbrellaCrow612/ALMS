@@ -38,12 +38,11 @@
                 :key="index"
                 class="flex items-center justify-between text-sm"
               >
-          
                 <span
                   :class="history.status === 'Returned' ? 'text-emerald-600' : 'text-blue-600'"
                   class="font-medium"
                 >
-                  {{  new Date(history) }}
+                  {{ new Date(history) }}
                 </span>
               </div>
             </div>
@@ -91,6 +90,12 @@
             </div>
           </div>
 
+          <!-- Lost Item Notification -->
+          <div v-if="mediaDetails.isLost" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong class="font-bold">This item is lost! - </strong>
+            <span class="block sm:inline">Wait for the branch librarian to put it back in stock.</span>
+          </div>
+
           <!-- Similar Items Card -->
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <h2 class="text-lg font-semibold mb-6 text-slate-800">Similar Items</h2>
@@ -115,14 +120,14 @@
           <div class="flex justify-end gap-4">
             <button 
               @click="reserveItem"
-              :disabled="!mediaDetails.isAvailable"
+              :disabled="!mediaDetails.isAvailable || mediaDetails.isLost"
               class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
             >
               Reserve
             </button>
             <button 
               @click="showBorrowConfirmation" 
-              :disabled="!mediaDetails.isAvailable" 
+              :disabled="!mediaDetails.isAvailable || mediaDetails.isLost" 
               class="px-6 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Borrow
@@ -195,8 +200,6 @@
     </Modal>
   </div>
 </template>
-
-
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';

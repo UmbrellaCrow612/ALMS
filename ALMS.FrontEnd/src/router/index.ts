@@ -11,6 +11,8 @@ import SearchUsersView from '@/views/SearchUsersView.vue'
 import MyMediaView from '@/views/MyMediaView.vue'
 import ReservationView from '@/views/ReservationView.vue'
 import UserDetailsView from '@/views/UserDetailsView.vue'
+import ForgotPassword from '@/views/ForgotPassword.vue'
+import ResetPassword from '@/views/ResetPassword.vue'
 
 const isAuthenticated = () => {
   
@@ -94,6 +96,21 @@ const router = createRouter({
       component: UserDetailsView,
       props: true,
       meta: { requiresAuth: true },
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: ForgotPassword,
+    },
+    {
+      path: '/forgot-password/:code',
+      name: 'reset-password',
+      component: ResetPassword,
     },
   ],
 })

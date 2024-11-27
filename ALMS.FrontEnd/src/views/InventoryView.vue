@@ -9,7 +9,7 @@
           type="search"
           placeholder="Search inventory..."
           v-model="searchQuery"
-          class="p-2 border border-gray-300 rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          class="p-2 border border-black rounded-md w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <button
           @click="openAddModal"
@@ -40,13 +40,14 @@
               <td class="px-6 py-4">{{ item.author }}</td>
               <td class="px-6 py-4">{{ item.genre }}</td>
               <td class="px-6 py-4">{{ mediaTypes[item.mediaType] }}</td>
+              <td class="px-6 py-4">{{ item.isAvailable ? 'Available' : 'Unavailable' }}</td>
               <td class="px-6 py-4">
                 <img :src="item.imgUrl" alt="Cover" class="w-16 h-16 object-cover rounded" />
               </td>
               <td class="px-6 py-4 flex space-x-2">
                 <button @click="openEditModal(item)" class="text-blue-500 hover:text-blue-700">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5L21.5 5.5M21.5 2.5L18.5 5.5M12 11l9-9"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" />
                   </svg>
                 </button>
                 <button @click="confirmDelete(item)" class="text-red-500 hover:text-red-700">
@@ -69,36 +70,43 @@
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-700">Title</label>
-              <input type="text" v-model="formData.title" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required />
+              <input type="text" v-model="formData.title" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Description</label>
-              <textarea v-model="formData.description" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+              <textarea v-model="formData.description" rows="3" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Published At</label>
-              <input type="date" v-model="formData.publishedAt" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+              <input type="date" v-model="formData.publishedAt" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">ISBN</label>
-              <input type="text" v-model="formData.isbn" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+              <input type="text" v-model="formData.isbn" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Image URL</label>
-              <input type="url" v-model="formData.imgUrl" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+              <input type="url" v-model="formData.imgUrl" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Author</label>
-              <input type="text" v-model="formData.author" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+              <input type="text" v-model="formData.author" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Genre</label>
-              <input type="text" v-model="formData.genre" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+              <input type="text" v-model="formData.genre" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700">Media Type</label>
-              <select v-model="formData.mediaType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+              <select v-model="formData.mediaType" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                 <option v-for="(type, index) in mediaTypes" :key="index" :value="index">{{ type }}</option>
+              </select>
+            </div>
+            <div v-if="editingMedia">
+              <label class="block text-sm font-medium text-gray-700">Is Lost</label>
+              <select v-model="formData.isLost" class="mt-1 block w-full rounded-md border-black shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option :value="true">True</option>
+                <option :value="false">False</option>
               </select>
             </div>
             <div class="flex justify-end space-x-3 mt-6">
@@ -137,10 +145,10 @@
 <script setup>
 import NavBar from '@/components/NavBar.vue';
 import Modal from '@/components/Modal.vue';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue'; 
 import axiosInstance from '@/plugins/axios';
 
-const columns = ['Title', 'Description', 'Published At', 'ISBN', 'Author', 'Genre', 'Media Type', 'Cover'];
+const columns = ['Title', 'Description', 'Published At', 'ISBN', 'Author', 'Genre', 'Media Type', 'Availability', 'Cover'];
 const inventory = ref([]);
 const searchQuery = ref('');
 const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
@@ -157,6 +165,7 @@ const formData = ref({
   author: '',
   genre: '',
   mediaType: 0,
+  isLost: false,
 });
 const editingMedia = ref(null);
 
@@ -192,6 +201,7 @@ const openAddModal = () => {
     author: '',
     genre: '',
     mediaType: 0,
+    isLost: false,
   };
   isModalOpen.value = true;
 };
