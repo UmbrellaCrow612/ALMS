@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241125184112_Init")]
+    [Migration("20241127113031_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -222,6 +222,9 @@ namespace ALMS.API.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsAvailable")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsLost")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("MediaType")

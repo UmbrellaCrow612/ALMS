@@ -17,5 +17,8 @@ namespace ALMS.API.DTOs.Media
         [Required]
         [EnumDataType(typeof(MediaType))]
         public required MediaType MediaType { get; set; }
+
+        [Required]
+        public required bool IsLost { get; set; }
     }
 }

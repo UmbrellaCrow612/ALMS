@@ -141,9 +141,14 @@ namespace ALMS.API.Controllers
             var media = await _dbContext.Medias.FirstOrDefaultAsync(x => x.Id == id);
             if(media is null) return NotFound("Media to borrow not found.");
 
-            if (!media.IsAvailable)
+            if (media.IsAvailable is false)
             {
                 return BadRequest("Media is currently not Available");
+            }
+
+            if (media.IsLost is true)
+            {
+                return BadRequest("Media is lost cannot be borrowed");
             }
 
             int borrowedMediCount = _dbContext.BorrowTransactions.Where(x => x.UserId == userId && x.IsReturned == false).Select(x => x.Id).Count();

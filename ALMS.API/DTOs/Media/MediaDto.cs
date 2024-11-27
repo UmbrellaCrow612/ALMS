@@ -14,6 +14,7 @@ namespace ALMS.API.DTOs.Media
         public required string Genre { get; set; }
         public required MediaType MediaType { get; set; }
         public required bool IsAvailable { get; set; }
+        public required bool IsLost { get; set; }
         public required DateTime DateAdded { get; set; }
     }
 }

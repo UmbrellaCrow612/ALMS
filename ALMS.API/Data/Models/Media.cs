@@ -16,6 +16,7 @@
         public required MediaType MediaType { get; set; }
         public required bool IsAvailable { get; set; } = true;
         public required DateTime? DateAdded { get; set; }
+        public bool IsLost { get; set; } = false;
 
         /// <summary>
         /// Ef COre Nav Property

@@ -221,6 +221,9 @@ namespace ALMS.API.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsLost")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("MediaType")
                         .HasColumnType("INTEGER");
 
