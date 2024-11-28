@@ -204,5 +204,14 @@ namespace ALMS.API.Controllers
 
             return Ok(dto);
         }
+
+        [Authorize]
+        [HttpGet("stripeProducts")]
+        public async Task<ActionResult> GetStripeProducts()
+        {
+            var products = await _dbContext.StripeProducts.ToListAsync();
+
+            return Ok(products);
+        }
     }
 }
