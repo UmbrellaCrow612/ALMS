@@ -203,12 +203,14 @@ namespace ALMS.API.Controllers
             var user = await _userManager.FindByIdAsync(attempt.UserId);
             if (user is null) return NotFound("User not found.");
 
+            attempt.IsSuccessful = true;
+
+            _dbContext.ForgotPasswordAttempts.Update(attempt);
+
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var result = await _userManager.ResetPasswordAsync(user, token, confirmForgotPasswordDto.NewPassword);
 
             if (!result.Succeeded) return BadRequest(result.Errors);
-
-            attempt.IsSuccessful = true;
 
             await _dbContext.SaveChangesAsync();
 
