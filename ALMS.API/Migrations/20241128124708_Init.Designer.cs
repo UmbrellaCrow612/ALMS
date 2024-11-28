@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241127113031_Init")]
+    [Migration("20241128124708_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -575,7 +575,7 @@ namespace ALMS.API.Migrations
             modelBuilder.Entity("ALMS.API.Data.Models.StripeSession", b =>
                 {
                     b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("StripeSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -661,6 +661,8 @@ namespace ALMS.API.Migrations
                     b.Navigation("BorrowedItems");
 
                     b.Navigation("ForgotPasswordAttempts");
+
+                    b.Navigation("StripeSessions");
 
                     b.Navigation("Subscriptions");
 

@@ -572,7 +572,7 @@ namespace ALMS.API.Migrations
             modelBuilder.Entity("ALMS.API.Data.Models.StripeSession", b =>
                 {
                     b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("StripeSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -658,6 +658,8 @@ namespace ALMS.API.Migrations
                     b.Navigation("BorrowedItems");
 
                     b.Navigation("ForgotPasswordAttempts");
+
+                    b.Navigation("StripeSessions");
 
                     b.Navigation("Subscriptions");
 
