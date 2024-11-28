@@ -3,6 +3,14 @@
     <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
       <h2 class="text-2xl font-bold text-center mb-6">Forgot Password</h2>
       <form @submit.prevent="sendResetLink" class="space-y-6">
+        <div v-if="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+          <strong class="font-bold">Success! </strong>
+          <span class="block sm:inline">{{ successMessage }}</span>
+        </div>
+        <div v-if="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong class="font-bold">Error! </strong>
+          <span class="block sm:inline">{{ errorMessage }}</span>
+        </div>
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
           <div class="mt-1">
@@ -26,14 +34,19 @@ import { ref } from 'vue';
 import axiosInstance from '@/plugins/axios';
 
 const email = ref('');
+const successMessage = ref('');
+const errorMessage = ref('');
 
 const sendResetLink = async () => {
+  successMessage.value = '';
+  errorMessage.value = '';
+
   try {
     await axiosInstance.post('/auth/forgot-password', { email: email.value });
-    alert('A password reset link has been sent to your email.');
+    successMessage.value = 'A password reset link has been sent to your email.';
   } catch (error) {
     console.error('Failed to send reset link:', error);
-    alert('Failed to send reset link. Please try again.');
+    errorMessage.value = 'Failed to send reset link. Please try again.';
   }
 };
 </script> 
