@@ -200,6 +200,8 @@ namespace ALMS.API.Controllers
             if (DateTime.UtcNow - attempt.CreatedAt > TimeSpan.FromMinutes(30))
                 return BadRequest("Password reset attempt has expired.");
 
+            if (attempt.IsSuccessful) return Unauthorized("Attempt already used");
+
             var user = await _userManager.FindByIdAsync(attempt.UserId);
             if (user is null) return NotFound("User not found.");
 
