@@ -1,5 +1,6 @@
 ﻿using ALMS.API.Data;
 using ALMS.API.DTOs.BorrowTransaction;
+using ALMS.API.DTOs.Users;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +64,18 @@ namespace ALMS.API.Controllers
             await _dbcontext.SaveChangesAsync();
 
             return Ok();
+        }
+
+        [Authorize]
+        [HttpGet("{userId}")]
+        public async Task<ActionResult> GetUserById(string userId)
+        {
+            var user = await _dbcontext.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user is null) return NotFound("user not found.");
+
+            var dto = _mapper.Map<UserDto>(user);
+
+            return Ok(dto);
         }
     }
 }
