@@ -36,8 +36,8 @@ namespace ALMS.API.Controllers
                 LineItems = lineItems,
                 Mode = "payment",
                 // Update to use localhost URLs for testing
-                SuccessUrl = "https://localhost:7066/swagger/index.html",
-                CancelUrl = "https://localhost:7066/swagger/index.html"
+                SuccessUrl = "http://localhost:5173/",
+                CancelUrl = "http://localhost:5173/"
             };
 
             var products = await _dbContext.StripeProducts.ToListAsync();
