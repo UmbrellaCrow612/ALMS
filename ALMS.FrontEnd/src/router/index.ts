@@ -13,6 +13,8 @@ import ReservationView from '@/views/ReservationView.vue'
 import UserDetailsView from '@/views/UserDetailsView.vue'
 import ForgotPassword from '@/views/ForgotPassword.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
+import UserProfile from '@/views/UserProfile.vue'
+import PaymentView from '@/views/PaymentView.vue'
 
 const isAuthenticated = () => {
   
@@ -106,6 +108,17 @@ const router = createRouter({
       path: '/forgot-password/:code',
       name: 'reset-password',
       component: ResetPassword,
+    },
+    {
+      path: '/profile',
+      name: 'userProfile',
+      component: UserProfile,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/payment',
+      name: 'payment',
+      component: PaymentView,
     },
   ],
 })
