@@ -29,7 +29,7 @@ const email = ref('');
 
 const sendResetLink = async () => {
   try {
-    await axiosInstance.post('/forgot-password', { email: email.value });
+    await axiosInstance.post('/auth/forgot-password', { email: email.value });
     alert('A password reset link has been sent to your email.');
   } catch (error) {
     console.error('Failed to send reset link:', error);

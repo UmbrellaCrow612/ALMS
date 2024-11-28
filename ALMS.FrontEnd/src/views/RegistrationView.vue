@@ -141,7 +141,7 @@ const form = ref({
   lastName: '',
   address: '',
   email: '',
-  phone: '',
+  phoneNumber: '',
   password: ''
 });
 
@@ -160,7 +160,7 @@ const handleSubmit = async () => {
       firstName: form.value.firstName,
       lastName: form.value.lastName,
       address: form.value.address,
-      phone: form.value.phoneNumber
+      phoneNumber: form.value.phoneNumber
     };
 
     const response = await axiosInstance.post('/auth/register', payload);

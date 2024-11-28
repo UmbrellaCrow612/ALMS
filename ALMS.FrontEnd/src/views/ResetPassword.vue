@@ -50,7 +50,7 @@ const resetPassword = async () => {
 
   try {
     const code = route.params.code;
-    await axiosInstance.post('/auth/reset-password', { code, newPassword: newPassword.value });
+    await axiosInstance.post('/reset-password', { code, newPassword: newPassword.value });
     alert('Your password has been reset successfully.');
   } catch (error) {
     console.error('Failed to reset password:', error);
