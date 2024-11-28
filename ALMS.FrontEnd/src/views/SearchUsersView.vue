@@ -45,7 +45,7 @@
         </form>
   
         <!-- User Table -->
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white shadow-md rounded-lg overflow-x-auto">
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
@@ -60,12 +60,12 @@
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-                <td class="px-6 py-4">{{ user.firstName }}</td>
-                <td class="px-6 py-4">{{ user.lastName }}</td>
-                <td class="px-6 py-4">{{ user.userName }}</td>
-                <td class="px-6 py-4">{{ user.email }}</td>
-                <td class="px-6 py-4">{{ user.phoneNumber }}</td>
-                <td class="px-6 py-4">{{ user.address }}</td>
+                <td class="px-6 py-4 whitespace-normal max-w-[150px] break-words">{{ user.firstName }}</td>
+                <td class="px-6 py-4 whitespace-normal max-w-[150px] break-words">{{ user.lastName }}</td>
+                <td class="px-6 py-4 whitespace-normal max-w-[150px] break-words">{{ user.userName }}</td>
+                <td class="px-6 py-4 whitespace-normal max-w-[200px] break-words">{{ user.email }}</td>
+                <td class="px-6 py-4 whitespace-normal max-w-[150px] break-words">{{ user.phoneNumber }}</td>
+                <td class="px-6 py-4 whitespace-normal max-w-[200px] break-words">{{ user.address }}</td>
                 <td class="px-6 py-4 flex space-x-2">
                   <button
                     v-if="!isAccountant"
