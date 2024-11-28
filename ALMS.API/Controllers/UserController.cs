@@ -1,5 +1,6 @@
 ﻿using ALMS.API.Data;
 using ALMS.API.DTOs.BorrowTransaction;
+using ALMS.API.DTOs.Subscription;
 using ALMS.API.DTOs.Users;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -76,6 +77,17 @@ namespace ALMS.API.Controllers
             var dto = _mapper.Map<UserDto>(user);
 
             return Ok(dto);
+        }
+
+        [Authorize]
+        [HttpGet("{userId}/subs")]
+        public async Task<ActionResult> GetSubsForUserId(string userId)
+        {
+            var subs = await _dbcontext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
+
+            var dto = _mapper.Map<ICollection<SubscriptionDto>>(subs);
+
+            return Ok(subs);
         }
     }
 }

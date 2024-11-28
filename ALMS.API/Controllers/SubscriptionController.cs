@@ -146,7 +146,7 @@ namespace ALMS.API.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(subscriptonToUpdate);
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
@@ -213,5 +213,6 @@ namespace ALMS.API.Controllers
 
             return Ok(products);
         }
+
     }
 }
