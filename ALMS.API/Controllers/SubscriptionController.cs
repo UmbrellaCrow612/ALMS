@@ -127,10 +127,42 @@ namespace ALMS.API.Controllers
         public async Task<ActionResult> GetSub()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            List<Subscription> subscriptions = [];
 
-            var subscriptionDetails = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
+            subscriptions = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
+            if(subscriptions.Count() == 0)
+            {
+                var stripeSessions = await _dbContext.StripeSessions.ToListAsync();
 
-            return Ok(subscriptionDetails);
+                foreach (var stripeSession in stripeSessions)
+                {
+                    var sessionId = stripeSession.SessionId;
+                    var service = new Stripe.Checkout.SessionService();
+                    var session = service.Get(sessionId);
+
+                    Subscription sub;
+                    // Successful payment, create the subscription
+                    sub = new Subscription
+                    {
+                        Status = session.PaymentStatus.ToString(),
+                        UserId = stripeSession.UserId,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddMonths(1)
+                    };
+                    await _dbContext.Subscriptions.AddAsync(sub);
+                    await _dbContext.SaveChangesAsync();
+                    subscriptions.Add(sub);
+                }
+                if (subscriptions.Count() == 0)
+                {
+                    return BadRequest("No session ID found.");
+                }
+                else
+                {
+                    return Ok(subscriptions);
+                }
+            }
+            return Ok(subscriptions);
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
