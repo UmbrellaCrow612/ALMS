@@ -25,6 +25,10 @@ namespace ALMS.API.Controllers
             var userToUpdate = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (userToUpdate is null) return NotFound("User not found.");
 
+            // Simple validation of the data (for example, missing required fields)
+            if (string.IsNullOrEmpty(updateUserDto.FirstName) || string.IsNullOrEmpty(updateUserDto.LastName))
+                return BadRequest("Invalid data entered. Please correct and try again.");
+
             _mapper.Map(updateUserDto, userToUpdate);
 
             var emailService = new EmailService();
@@ -37,12 +41,12 @@ namespace ALMS.API.Controllers
 
             await _dbContext.SaveChangesAsync();
 
-            return NoContent();
+            return Ok("Profile updated successfully.");
         }
 
         [Authorize(Roles = $"{UserRoles.BranchLibarian},{UserRoles.CallCenterOperator},{UserRoles.Accountant}")]
         [HttpGet("search")]
-        public async Task<ActionResult<List<MediaDto>>> GetProfile([FromQuery] SearchUserQuery query)
+        public async Task<ActionResult<List<UserDto>>> GetProfile([FromQuery] SearchUserQuery query)
         {
             var userQuery = _dbContext.Users.AsQueryable();
 
