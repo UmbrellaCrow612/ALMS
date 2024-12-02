@@ -7,5 +7,9 @@
         public required string Product { get; set; }
         public required long Quanity { get; set; }
         public required string Rate { get; set; }
+
+        public ICollection<StripeSession> Sessions { get; set; } = [];
+        public ICollection<Subscription> subscriptions { get; set; } = [];
+
     }
 }

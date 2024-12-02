@@ -17,11 +17,11 @@ namespace ALMS.API.Controllers
 {
     [ApiController]
     [Route("subscription")]
-    public class SubscriptionController(ApplicationDbContext dbContext,UserManager<ApplicationUser> userManager, IMapper mapper) : ControllerBase
+    public class SubscriptionController(ApplicationDbContext dbContext, UserManager<ApplicationUser> userManager, IMapper mapper) : ControllerBase
     {
         private readonly ApplicationDbContext _dbContext = dbContext;
         private readonly IMapper _mapper = mapper;
-        private readonly UserManager<ApplicationUser> _userManager = userManager; 
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
 
         [Authorize]
         [HttpPost("subscribe/{stripeProductId}")]
@@ -30,7 +30,11 @@ namespace ALMS.API.Controllers
 
             var lineItems = new List<SessionLineItemOptions>();
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
+            StripeProductEntity theProduct = _dbContext.StripeProducts.FirstOrDefault(p => p.Id == stripeProductId);
+            if (theProduct is null)
+            {
+                return NotFound("Stripe Product Not Found");
+            }
             var options = new Stripe.Checkout.SessionCreateOptions
             {
                 LineItems = lineItems,
@@ -43,31 +47,24 @@ namespace ALMS.API.Controllers
             var products = await _dbContext.StripeProducts.ToListAsync();
 
             // Loop through products to add them to the session
-            foreach (var product in products)
+
+            decimal price = decimal.TryParse(theProduct.Rate.Replace("£", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result) ? result : 0m;
+            var sessionListItem = new SessionLineItemOptions
             {
-                if (product.Id == stripeProductId)
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    decimal price = decimal.TryParse(product.Rate.Replace("£", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal result) ? result : 0m;
-                    var sessionListItem = new SessionLineItemOptions
+                    UnitAmount = (long)(price * 100), // Stripe expects the amount in cents
+                    Currency = "GBP",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        PriceData = new SessionLineItemPriceDataOptions
-                        {
-                            UnitAmount = (long)(price * 100), // Stripe expects the amount in cents
-                            Currency = "GBP",
-                            ProductData = new SessionLineItemPriceDataProductDataOptions
-                            {
-                                Name = product.Product.ToString(),
-                            }
-                        },
-                        Quantity = product.Quanity
-                    };
-                    options.LineItems.Add(sessionListItem);
-                }
-            }
-            if (options.LineItems.Count == 0)
-            {
-                return NotFound("Stripe Product Not Found");
-            }
+                        Name = theProduct.Product.ToString(),
+                    }
+                },
+                Quantity = theProduct.Quanity
+            };
+            options.LineItems.Add(sessionListItem);
+
+
 
             var service = new Stripe.Checkout.SessionService();
             Stripe.Checkout.Session session = service.Create(options);
@@ -78,19 +75,17 @@ namespace ALMS.API.Controllers
                 return BadRequest("Stripe session creation failed. No URL returned.");
             }
 
-            await _dbContext.StripeSessions.AddAsync(new StripeSession { SessionId = session.Id, SessionUrl = session.Url, UserId = userId });
+            await _dbContext.StripeSessions.AddAsync(new StripeSession { SessionId = session.Id, SessionUrl = session.Url, UserId = userId, ProductId = theProduct.Id });
             await _dbContext.SaveChangesAsync();
 
             var redirectUrl = session.Url;
             return Ok(redirectUrl);
         }
 
-        [Authorize(Roles = UserRoles.Accountant)]
-        [HttpGet("subscribersDetails")]
-        public async Task<ActionResult> GetSubscribersDetails()
+        [Authorize]
+        [HttpGet("GetSubscription/{userId}")]
+        public async Task<ActionResult> GetSub(string userId)
         {
-            List<Subscription> subscriptions = [];
-
             var stripeSessions = await _dbContext.StripeSessions.ToListAsync();
 
             foreach (var stripeSession in stripeSessions)
@@ -99,19 +94,31 @@ namespace ALMS.API.Controllers
                 var service = new Stripe.Checkout.SessionService();
                 var session = service.Get(sessionId);
 
-                Subscription sub;
-                // Successful payment, create the subscription
-                sub = new Subscription
+
+
+                var subExisted = await _dbContext.Subscriptions.AnyAsync(s => s.UserId == stripeSession.UserId && s.ProductId == stripeSession.ProductId);
+
+                if (!subExisted)
                 {
-                    Status = session.PaymentStatus.ToString(),
-                    UserId = stripeSession.UserId,
-                    StartDate = DateTime.Now,
-                    EndDate = DateTime.Now.AddMonths(1)
-                };
-                await _dbContext.Subscriptions.AddAsync(sub);
-                await _dbContext.SaveChangesAsync();
-                subscriptions.Add(sub);
+                    Subscription sub;
+                    // Successful payment, create the subscription
+
+                    sub = new Subscription
+                    {
+                        Status = session.Status,
+                        UserId = stripeSession.UserId,
+                        StartDate = session.Created,
+                        EndDate = session.Created.AddMonths(1),
+                        ProductId = stripeSession.ProductId
+                    };
+                    await _dbContext.Subscriptions.AddAsync(sub);
+                    await _dbContext.SaveChangesAsync();
+                }
+                
             }
+
+            List<Subscription> subscriptions = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
+
             if (subscriptions.Count() == 0)
             {
                 return BadRequest("No session ID found.");
@@ -120,49 +127,6 @@ namespace ALMS.API.Controllers
             {
                 return Ok(subscriptions);
             }
-        }
-
-        [Authorize]
-        [HttpGet("mysubscription")]
-        public async Task<ActionResult> GetSub()
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            List<Subscription> subscriptions = [];
-
-            subscriptions = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
-            if(subscriptions.Count() == 0)
-            {
-                var stripeSessions = await _dbContext.StripeSessions.ToListAsync();
-
-                foreach (var stripeSession in stripeSessions)
-                {
-                    var sessionId = stripeSession.SessionId;
-                    var service = new Stripe.Checkout.SessionService();
-                    var session = service.Get(sessionId);
-
-                    Subscription sub;
-                    // Successful payment, create the subscription
-                    sub = new Subscription
-                    {
-                        Status = session.PaymentStatus.ToString(),
-                        UserId = stripeSession.UserId,
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddMonths(1)
-                    };
-                    await _dbContext.Subscriptions.AddAsync(sub);
-                    await _dbContext.SaveChangesAsync();
-                    subscriptions.Add(sub);
-                }
-                if (subscriptions.Count() == 0)
-                {
-                    return BadRequest("No session ID found.");
-                }
-                else
-                {
-                    return Ok(subscriptions);
-                }
-            }
-            return Ok(subscriptions);
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
@@ -221,20 +185,6 @@ namespace ALMS.API.Controllers
             await _dbContext.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        [Authorize]
-        [HttpGet("users/{userId}")]
-        public async Task<ActionResult> GetSubForUserId(string userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user is null) return NotFound("User not found.");
-
-            var subscriptions = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
-
-            var dto = _mapper.Map<IEnumerable<SubscriptionDto>>(subscriptions);
-
-            return Ok(dto);
         }
 
         [Authorize]

@@ -6,6 +6,9 @@
         public required string Status { get; set; }
         public ApplicationUser? User { get; set; } = null;
 
+        public required string ProductId { get; set; }
+        public StripeProductEntity? StripeProduct { get; set; }
+
         public required string UserId { get; set; }
 
         public required DateTime StartDate { get; set; }
