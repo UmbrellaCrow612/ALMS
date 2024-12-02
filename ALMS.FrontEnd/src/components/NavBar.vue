@@ -49,12 +49,6 @@
                   >
                     My Media
                   </router-link>
-                  <router-link
-                    to="/subscriptions"
-                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Manage Subscriptions
-                  </router-link>
                   <button
                     @click="handleLogout"
                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -134,7 +128,6 @@
     { name: 'About', href: '/about', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator', 'Accountant'] },,
     { name: 'Search', href: '/search', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator', 'Accountant'] },
     { name: 'Inventory', href: '/inventory', roles: ['BranchLibarian'] },
-    { name: 'Subscriptions', href: '/subscriptions', roles: ['LibaryMember', 'BranchLibarian', 'CallCenterOperator'] },
     { name: 'Approval', href: '/approval', roles: ['BranchLibarian'] },
     { name: 'Search Users', href: '/search-users', roles: ['CallCenterOperator', 'Accountant'] },
     { name: 'Reservations', href: '/reservations', roles: ['BranchLibarian'] },

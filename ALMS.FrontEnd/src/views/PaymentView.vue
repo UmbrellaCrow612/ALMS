@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+  <div class="min-h-screen bg-gradient-to-br from-gray-100 to-gray-100 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
     <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all hover:scale-105 duration-300">
       <div class="p-8">
         <h2 class="text-3xl font-extrabold text-center text-indigo-800 mb-8">Payment Details</h2>
