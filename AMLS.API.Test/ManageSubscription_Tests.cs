@@ -195,40 +195,5 @@ namespace AMLS.API.Test
             Assert.Equal("Stripe Product Not Found", notFoundResult.Value);
         }
 
-        //[Fact]
-        //public async Task GetSubscribersDetails_ShouldReturnOk_WithValidSessions()
-        //{
-        //    // Arrange: Add mock Stripe session to the in-memory database
-        //    var stripeSession = new StripeSession
-        //    {
-        //        SessionId = "sessionGetSubscribersDetails",
-        //        SessionUrl = "http://example.com",
-        //        UserId = "user1"
-        //    };
-        //    _dbContext.StripeSessions.Add(stripeSession);
-        //    await _dbContext.SaveChangesAsync();
-
-        //    // Mock the response from the Stripe API for the session
-        //    var mockStripeSession = new Stripe.Checkout.Session
-        //    {
-        //        Id = "sessionGetSubscribersDetails",
-        //        PaymentStatus = "paid",
-        //        Url = "http://example.com"
-        //    };
-
-        //    // Mock the Stripe SessionService.Get method to return the mock session when called with the correct session ID
-        //    _mockSessionService.Setup(service =>
-        //        service.Get("sessionGetSubscribersDetails", It.IsAny<SessionGetOptions>(), It.IsAny<RequestOptions>()))
-        //        .Returns(mockStripeSession);
-
-        //    // Act: Call the GetSubscribersDetails method in the controller
-        //    var result = await _controller.GetSubscribersDetails();
-
-        //    // Assert: Check if the result is Ok and the list of subscriptions is returned
-        //    var actionResult = Assert.IsType<OkObjectResult>(result);
-        //    var subscriptions = Assert.IsType<List<ALMS.API.Data.Models.Subscription>>(actionResult.Value);
-        //    Assert.Single(subscriptions);  // Ensure only one subscription is returned
-        //    Assert.Equal("user1", subscriptions[0].UserId);  // Verify the userId
-        //}
     }
 }

@@ -130,11 +130,11 @@ namespace ALMS.API.Controllers
         }
 
         [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("update/{stripeProductId}")]
-        public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto, string stripeProductId)
+        [HttpPatch("update/{subscriptionId}")]
+        public async Task<ActionResult> UpdateSub([FromBody] UpdateSubscriptionDto updateSubscriptionDto, string subscriptionId)
         {
 
-            var subscriptonToUpdate = await _dbContext.Subscriptions.FirstOrDefaultAsync(x => x.Id == stripeProductId);
+            var subscriptonToUpdate = await _dbContext.Subscriptions.FirstOrDefaultAsync(x => x.Id == subscriptionId);
 
             if (subscriptonToUpdate is null) return NotFound();
 
@@ -145,48 +145,6 @@ namespace ALMS.API.Controllers
             return Ok(subscriptonToUpdate);
         }
 
-        [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPost("stripeSubscription/create")]
-        public async Task<ActionResult> CreateStripeProduct([FromBody] CreateStripeProductDto createStripeProductDto)
-        {
-
-            var stripeProduct = _mapper.Map<StripeProductEntity>(createStripeProductDto);
-
-            await _dbContext.StripeProducts.AddAsync(stripeProduct);
-            await _dbContext.SaveChangesAsync();
-
-            return Created(nameof(createStripeProductDto), new { stripeProduct.Id });
-        }
-
-        [Authorize(Roles = UserRoles.Accountant)]
-        [HttpPatch("stripeSubscription/update/{stripeProductId}")]
-        public async Task<ActionResult> UpdateStripeProduct([FromBody] UpdateStripeProductDto updateStripeProductDto, string stripeProductId)
-        {
-
-            var StripeProductToUpdate = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == stripeProductId);
-
-            if (StripeProductToUpdate is null) return NotFound();
-
-            _mapper.Map(updateStripeProductDto, StripeProductToUpdate);
-
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        [Authorize(Roles = UserRoles.Accountant)]
-        [HttpDelete("stripeSubscription/delete/{stripeProductId}")]
-        public async Task<ActionResult> DeleteStripeSubscriptionItem(string stripeProductId)
-        {
-            var stripeSubscriptionToDelete = await _dbContext.StripeProducts.FirstOrDefaultAsync(x => x.Id == stripeProductId);
-            if (stripeSubscriptionToDelete is null) return NotFound();
-
-            _dbContext.StripeProducts.Remove(stripeSubscriptionToDelete);
-            await _dbContext.SaveChangesAsync();
-
-            return NoContent();
-        }
-
         [Authorize]
         [HttpGet("stripeProducts")]
         public async Task<ActionResult> GetStripeProducts()
@@ -195,6 +153,5 @@ namespace ALMS.API.Controllers
 
             return Ok(products);
         }
-
     }
 }
