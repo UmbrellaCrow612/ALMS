@@ -59,22 +59,9 @@ namespace AMLS.API.Test
                     .ForMember(dest => dest.Id, opt => opt.Ignore())
                     .ForMember(dest => dest.User, opt => opt.Ignore())
                     .ForMember(dest => dest.UserId, opt => opt.Ignore())
+                    .ForMember(dest => dest.StripeProduct, opt => opt.Ignore())
+                    .ForMember(dest => dest.ProductId, opt => opt.Ignore())
                     .ForMember(dest => dest.StartDate, opt => opt.Ignore());
-
-                // Mapping for CreateStripeProductDto to StripeProductEntity (for product creation)
-                cfg.CreateMap<CreateStripeProductDto, StripeProductEntity>()
-                   .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
-                    .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate))
-                    .ForMember(dest => dest.Quanity, opt => opt.MapFrom(src => src.Quanity))
-                    .ForMember(dest => dest.Id, opt => opt.Ignore());
-
-
-                // Mapping for UpdateStripeProductDto to StripeProductEntity (for product updates)
-                cfg.CreateMap<UpdateStripeProductDto, StripeProductEntity>()
-                    .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
-                    .ForMember(dest => dest.Rate, opt => opt.MapFrom(src => src.Rate))
-                    .ForMember(dest => dest.Quanity, opt => opt.MapFrom(src => src.Quanity))
-                    .ForMember(dest => dest.Id, opt => opt.Ignore()); // Assuming Id is auto-generated
             });
 
             mapperConfig.AssertConfigurationIsValid();
@@ -194,6 +181,134 @@ namespace AMLS.API.Test
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             Assert.Equal("Stripe Product Not Found", notFoundResult.Value);
         }
+        [Fact]
+        public async Task GetSub_ShouldReturnOk_WithValidUserId()
+        {
+            // Arrange: Add mock Stripe session to the in-memory database
+            var session = new StripeSession
+            {
+                SessionId = "cs_test_a12PCVw51ozVrz5JnG2tTISqtmqmH7xopYK991agv1kGuEWhQwHTsvpWNU",
+                SessionUrl = "http://example.com",
+                UserId = "user1",
+                ProductId = "product1"
+            };
+            _dbContext.StripeSessions.Add(session);
+            await _dbContext.SaveChangesAsync();
 
+            var mockSessionService = new Mock<Stripe.Checkout.SessionService>();
+            var mockSession = new Session
+            {
+                Id = "cs_test_a12PCVw51ozVrz5JnG2tTISqtmqmH7xopYK991agv1kGuEWhQwHTsvpWNU",
+                Created = DateTime.Now// Example Unix timestamp (January 1, 2021)
+            };
+
+            // Mocking the Get method to return the mock session
+            var service = mockSessionService.Object;
+            mockSessionService.Setup(service => service.Get("cs_test_a12PCVw51ozVrz5JnG2tTISqtmqmH7xopYK991agv1kGuEWhQwHTsvpWNU", It.IsAny<SessionGetOptions>(), It.IsAny<RequestOptions>()))
+                              .Returns(mockSession);
+
+            var sub = new ALMS.API.Data.Models.Subscription
+            {
+                Status = "paid",
+                EndDate= DateTime.UtcNow.AddMonths(1),
+                StartDate = DateTime.UtcNow,
+                UserId = "user1",
+                ProductId = "product1"
+            };
+            _dbContext.Subscriptions.Add(sub);
+            await _dbContext.SaveChangesAsync();
+
+            // Act: Call GetSub method in the controller
+            var result = await _controller.GetSub("user1");
+
+            // Assert: Check if the result is Ok and contains subscription data
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            var subscriptions = Assert.IsType<List<ALMS.API.Data.Models.Subscription>>(actionResult.Value);
+            Assert.Single(subscriptions);  // Ensure only one subscription is returned
+            Assert.Equal("user1", subscriptions[0].UserId);  // Verify the userId
+        }
+
+        [Fact]
+        public async Task GetSub_ShouldReturnBadRequest_WhenNoSubscriptionsExist()
+        {
+            // Arrange: Ensure there are no subscriptions in the database for the user
+            var result = await _controller.GetSub("user2");
+
+            // Assert: Ensure the result is a BadRequest
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.Equal("No session ID found.", badRequestResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateSub_ShouldReturnOk_WithValidData()
+        {
+            // Arrange: Add a subscription to the in-memory database
+            var subscription = new ALMS.API.Data.Models.Subscription
+            {
+                Id = "sub123",
+                Status = "active",
+                UserId = "user1",
+                ProductId = "product1",
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddMonths(1)
+            };
+            _dbContext.Subscriptions.Add(subscription);
+            await _dbContext.SaveChangesAsync();
+
+            var updateSubscriptionDto = new UpdateSubscriptionDto
+            {
+                Status = "inactive",
+                EndDate = DateTime.UtcNow.AddMonths(2)
+            };
+
+            // Act: Call UpdateSub method in the controller
+            var result = await _controller.UpdateSub(updateSubscriptionDto, "sub123");
+
+            // Assert: Check if the result is Ok and subscription data is updated
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            var updatedSubscription = Assert.IsType<ALMS.API.Data.Models.Subscription>(actionResult.Value);
+            Assert.Equal("inactive", updatedSubscription.Status);
+            Assert.Equal(DateTime.UtcNow.AddMonths(2).ToString(), updatedSubscription.EndDate.ToString());
+        }
+
+        [Fact]
+        public async Task UpdateSub_ShouldReturnNotFound_WhenInvalidSubscriptionId()
+        {
+            // Arrange: Ensure there are no subscriptions in the in-memory database
+            var updateSubscriptionDto = new UpdateSubscriptionDto
+            {
+                Status = "inactive",
+                EndDate = DateTime.UtcNow.AddMonths(2)
+            };
+
+            // Act: Call UpdateSub method in the controller with an invalid subscriptionId
+            var result = await _controller.UpdateSub(updateSubscriptionDto, "invalidSubId");
+
+            // Assert: Ensure the result is NotFound
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task GetStripeProducts_ShouldReturnOk_WithProducts()
+        {
+            // Arrange: Add some Stripe products to the in-memory database
+            var product = new StripeProductEntity
+            {
+                Id = "product1",
+                Product = "Test Product",
+                Rate = "£10.00",
+                Quanity = 1
+            };
+            _dbContext.StripeProducts.Add(product);
+            await _dbContext.SaveChangesAsync();
+
+            // Act: Call GetStripeProducts method in the controller
+            var result = await _controller.GetStripeProducts();
+
+            // Assert: Ensure the result is Ok and contains product data
+            var actionResult = Assert.IsType<OkObjectResult>(result);
+            var products = Assert.IsType<List<StripeProductEntity>>(actionResult.Value);
+            Assert.Contains(products, p => p.Product == "Test Product");
+        }
     }
 }

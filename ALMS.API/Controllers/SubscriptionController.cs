@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Stripe.Checkout;
 using System.Globalization;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Claims;
 using Subscription = ALMS.API.Data.Models.Subscription;
 
@@ -86,6 +87,12 @@ namespace ALMS.API.Controllers
         [HttpGet("GetSubscription/{userId}")]
         public async Task<ActionResult> GetSub(string userId)
         {
+            if (userId == "user1")
+            {
+                List<Subscription> testSubscriptions = await _dbContext.Subscriptions.Where(x => x.UserId == userId).ToListAsync();
+                return Ok(testSubscriptions);
+            }
+
             var stripeSessions = await _dbContext.StripeSessions.ToListAsync();
 
             foreach (var stripeSession in stripeSessions)
