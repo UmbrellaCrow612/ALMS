@@ -63,10 +63,10 @@ namespace ALMS.API.Controllers
                     };
                     options.LineItems.Add(sessionListItem);
                 }
-                else
-                {
-                    return NotFound("Stripe Product Not Found");
-                }
+            }
+            if (options.LineItems.Count == 0)
+            {
+                return NotFound("Stripe Product Not Found");
             }
 
             var service = new Stripe.Checkout.SessionService();
