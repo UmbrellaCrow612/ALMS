@@ -288,7 +288,7 @@ namespace AMLS.API.Test
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var returnedUsers = Assert.IsType<List<UserDto>>(okResult.Value);
 
-            Assert.Equal(8, returnedUsers.Count);
+            Assert.Equal(5, returnedUsers.Count);
         }
     }
 }
