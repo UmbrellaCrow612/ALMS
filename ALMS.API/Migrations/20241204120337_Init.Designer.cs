@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ALMS.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241128124708_Init")]
+    [Migration("20241204120337_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -299,6 +299,10 @@ namespace ALMS.API.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SessionId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -313,6 +317,8 @@ namespace ALMS.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ProductId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("StripeSessions");
@@ -326,6 +332,10 @@ namespace ALMS.API.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("TEXT");
 
@@ -333,11 +343,16 @@ namespace ALMS.API.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("StripeProductId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("StripeProductId");
 
                     b.HasIndex("UserId");
 
@@ -574,22 +589,36 @@ namespace ALMS.API.Migrations
 
             modelBuilder.Entity("ALMS.API.Data.Models.StripeSession", b =>
                 {
+                    b.HasOne("ALMS.API.Data.Models.StripeProductEntity", "Product")
+                        .WithMany("Sessions")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
                         .WithMany("StripeSessions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Product");
+
                     b.Navigation("User");
                 });
 
             modelBuilder.Entity("ALMS.API.Data.Models.Subscription", b =>
                 {
+                    b.HasOne("ALMS.API.Data.Models.StripeProductEntity", "StripeProduct")
+                        .WithMany("subscriptions")
+                        .HasForeignKey("StripeProductId");
+
                     b.HasOne("ALMS.API.Data.Models.ApplicationUser", "User")
                         .WithMany("Subscriptions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("StripeProduct");
 
                     b.Navigation("User");
                 });
@@ -674,6 +703,13 @@ namespace ALMS.API.Migrations
                     b.Navigation("BorrowedTransactions");
 
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("ALMS.API.Data.Models.StripeProductEntity", b =>
+                {
+                    b.Navigation("Sessions");
+
+                    b.Navigation("subscriptions");
                 });
 #pragma warning restore 612, 618
         }
