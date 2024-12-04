@@ -23,3 +23,27 @@ test('Authentication - User registers ', async ({ page }) => {
   await page.getByLabel('Password').fill('Password@123');
   await page.getByRole('button', { name: 'Register' }).click();
 })
+
+test('test', async ({ page }) => {
+  await page.getByRole('link', { name: 'Inventory' }).click();
+  await page.getByRole('button', { name: 'Add Media' }).click();
+  await page.locator('div').filter({ hasText: /^Title$/ }).getByRole('textbox').click();
+  await page.locator('div').filter({ hasText: /^Title$/ }).getByRole('textbox').fill('media to add');
+  await page.locator('textarea').click();
+  await page.locator('textarea').fill('des');
+  await page.locator('input[type="date"]').fill('2000-12-12');
+  await page.locator('div').filter({ hasText: /^ISBN$/ }).getByRole('textbox').click();
+  await page.locator('div').filter({ hasText: /^ISBN$/ }).getByRole('textbox').fill('ewfwef');
+  await page.locator('input[type="url"]').click();
+  await page.locator('input[type="url"]').click();
+  await page.locator('input[type="url"]').fill('https://picsum.photos/200/300');
+  await page.locator('div').filter({ hasText: /^Author$/ }).getByRole('textbox').click();
+  await page.locator('div').filter({ hasText: /^Author$/ }).getByRole('textbox').fill('rtyg');
+  await page.locator('div').filter({ hasText: /^Genre$/ }).getByRole('textbox').click();
+  await page.locator('div').filter({ hasText: /^Genre$/ }).getByRole('textbox').fill('wedd');
+  await page.locator('div').filter({ hasText: /^Genre$/ }).getByRole('textbox').press('ControlOrMeta+-');
+  await page.getByRole('combobox').selectOption('1');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await page.getByRole('link', { name: 'Search' }).click();
+  await page.getByRole('link', { name: 'Inventory' }).click();
+});
