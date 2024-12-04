@@ -19,7 +19,7 @@
         </button>
       </div>
 
-      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <div class="bg-white shadow-md rounded-lg overflow-y-scroll h-[650px]">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>

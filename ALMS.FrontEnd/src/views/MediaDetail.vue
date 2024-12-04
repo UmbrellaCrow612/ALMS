@@ -142,7 +142,7 @@
       <template #header>Confirm Borrow</template>
       <template #body>
         <div v-if="borrowError" class="text-red-600 mb-4">{{ borrowError }}</div>
-        Are you sure you want to borrow this item?
+        Are you sure you want to borrow this item? <div v-if="errorMessage" class="text-red-600 p-3">{{ errorMessage }}</div>
       </template>
       <template #footer>
         <button 
@@ -221,7 +221,7 @@ const isReserveModalVisible = ref(false);
 const reserveError = ref(null);
 const reserveFromDate = ref('');
 const reserveToDate = ref('');
-
+const errorMessage = ref("");
 const mediaTypes = ['DVD', 'Book', 'AudioBook', 'Games', 'Journal', 'Periodicals', 'CDs', 'MultimediaTitles'];
 
 const today = computed(() => {
@@ -289,8 +289,10 @@ const confirmBorrow = async () => {
       window.location.reload();
     }
   } catch (error) {
-    borrowError.value = 'Failed to borrow item. Please try again.';
-    console.error('Failed to borrow item:', error);
+    // Ensure we safely handle the backend error response
+    const backendErrorMessage = error.response?.data || 'An unexpected error occurred';
+    errorMessage.value = backendErrorMessage; // Update the state with the backend error
+    console.error('Failed to borrow item:', backendErrorMessage); // Log detailed error
   }
 };
 
