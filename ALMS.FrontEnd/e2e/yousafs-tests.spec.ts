@@ -45,8 +45,62 @@ test('Use case 3', async ({ page }) => {
   await page.getByRole('button', { name: 'Confirm' }).click();
 });
 
-// add login 
+// checks that user who dose not exist cannot login and a user who dose can
+test('Use case 4 - Login', async ({ page }) => {
+  await page.goto('http://localhost:5173/login');
+  await page.getByLabel('Email address').click();
+  await page.getByLabel('Email address').fill('randomemail@gmail.com');
+  await page.getByLabel('Email address').press('Tab');
+  await page.getByLabel('Password').fill('bfvirewfibewfib');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByText('User does not exist or is not')).toBeVisible();
+  await page.getByLabel('Email address').click();
+  await page.getByLabel('Email address').fill('branchlibrarian@example.com');
+  await page.getByLabel('Password').click();
+  await page.getByLabel('Password').fill('SecureP@ssw0rd');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page.getByRole('navigation').getByRole('button')).toBeVisible();
+});
 
-// add register 
 
-// add forgot password
+// trys to register a user with invalid credential format and a user with correct credential format.
+test('Use case 4 - User Registration', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByRole('link', { name: 'Register' }).click();
+  await page.getByLabel('Username').click();
+  await page.getByLabel('Username').fill('dnwifnmwnf');
+  await page.getByLabel('Username').press('Tab');
+  await page.getByLabel('First Name').fill('wenfokwfoin');
+  await page.getByLabel('First Name').press('Tab');
+  await page.getByLabel('Last Name').fill('wenfoewfin');
+  await page.getByLabel('Last Name').press('Tab');
+  await page.getByLabel('Address', { exact: true }).fill('owenfogfni');
+  await page.getByLabel('Address', { exact: true }).press('Tab');
+  await page.getByLabel('Phone Number').fill('oiewfinfin');
+  await page.getByLabel('Phone Number').press('Tab');
+  await page.getByLabel('Email address').fill('oewnfoinf@gmail.com');
+  await page.getByLabel('Email address').press('Tab');
+  await page.getByLabel('Password').fill('oiewnfoinf');
+  await page.getByRole('button', { name: 'Register' }).click();
+  await expect(page.getByText('The PhoneNumber field is not')).toBeVisible();
+  await page.getByLabel('Phone Number').click();
+  await page.getByLabel('Phone Number').fill('123456789');
+  await page.getByRole('button', { name: 'Register' }).click();
+  await expect(page.getByText('PasswordRequiresNonAlphanumeric')).toBeVisible();
+  await page.getByLabel('Password').click();
+  await page.getByLabel('Password').fill('Password@123');
+  await page.getByRole('button', { name: 'Register' }).click();
+  await expect(page.getByText('You successfully created an')).toBeVisible();
+});
+
+// user gets a reset link
+test('use case 4 - User clicks forgot password', async ({ page }) => {
+  await page.goto('http://localhost:5173/');
+  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByRole('link', { name: 'Forgot your password?' }).click();
+  await page.getByLabel('Email Address').click();
+  await page.getByLabel('Email Address').fill('weffwfw@gmail.com');
+  await page.getByRole('button', { name: 'Send Reset Link' }).click();
+  await expect(page.getByText('A password reset link has')).toBeVisible();
+});
