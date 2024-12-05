@@ -16,7 +16,11 @@
             <p class="text-sm text-green-700">{{ successMessage }}</p>
           </div>
           <div v-if="errorMessage" class="bg-red-50 p-4 rounded-md">
-            <p class="text-sm text-red-700">{{ errorMessage }}</p>
+            <div v-for="(errors, field) in errorMessage" :key="field">
+              <p v-for="error in errors" :key="error" class="error-text">
+                {{ error }}
+              </p>
+            </div>
           </div>
 
           <div>
@@ -172,7 +176,7 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     if (error.response?.status) {
-      errorMessage.value = `Registration failed. Server responded with status: ${error.response.status}`;
+      errorMessage.value = error.response.data.errors
     } else {
       errorMessage.value = 'An unexpected error occurred. Please try again later.';
     }
