@@ -17,12 +17,13 @@
           </div>
 
           <!-- Borrow History Card -->
+          <!-- Borrow History Card -->
           <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
             <h2 class="text-lg font-semibold mb-6 flex items-center text-slate-800">
               <Clock class="mr-3 h-5 w-5 text-slate-600" />
               Borrow History
             </h2>
-            <div v-if="loadingHistory" class="text-center py-6">
+            <div v-if="loadingHistory" data-test="loading-history" class="text-center py-6">
               <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-600 mx-auto"></div>
               <p class="mt-2 text-slate-600">Loading history...</p>
             </div>
@@ -32,17 +33,22 @@
             <div v-else-if="borrowHistory.length === 0" class="text-slate-600 text-center py-6">
               No borrow history available.
             </div>
-            <div v-else class="space-y-5">
+            <div v-else class="space-y-5" data-test="borrow-history-container">
               <div
                 v-for="(history, index) in borrowHistory"
                 :key="index"
+                data-test="borrow-history-item"
                 class="flex items-center justify-between text-sm"
               >
                 <span
                   :class="history.status === 'Returned' ? 'text-emerald-600' : 'text-blue-600'"
                   class="font-medium"
                 >
-                  {{ new Date(history) }}
+                  {{ new Date(history).toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }) }}
                 </span>
               </div>
             </div>
